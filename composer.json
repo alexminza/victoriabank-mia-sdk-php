@@ -1,0 +1,39 @@
+{
+    "name": "alexminza/victoriabank-mia-sdk",
+    "description": "PHP SDK for Victoriabank MIA API",
+    "type": "library",
+    "keywords": [
+        "victoriabank",
+        "moldova",
+        "mia",
+        "qr",
+        "payments",
+        "api",
+        "sdk",
+        "php"
+    ],
+    "homepage": "https://github.com/alexminza/victoriabank-mia-sdk-php",
+    "license": "GPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "Alexander Minza",
+            "homepage": "https://www.alexminza.com",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/alexminza/victoriabank-mia-sdk-php/issues",
+        "forum": "https://github.com/alexminza/victoriabank-mia-sdk-php/discussions",
+        "source": "https://github.com/alexminza/victoriabank-mia-sdk-php"
+    },
+    "require": {
+        "php": ">=7.2.5",
+        "guzzlehttp/guzzle": "~7.0",
+        "guzzlehttp/guzzle-services": "~1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "VictoriabankMia\\": "src/"
+        }
+    }
+}
