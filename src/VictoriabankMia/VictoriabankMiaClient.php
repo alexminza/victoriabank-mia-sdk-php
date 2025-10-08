@@ -29,4 +29,102 @@ class VictoriabankMiaClient extends GuzzleClient
         $description = $description instanceof DescriptionInterface ? $description : new VictoriabankMiaDescription();
         parent::__construct($client, $description, null, null, null, $config);
     }
+
+    public function createPayeeQr($qrData, $authToken, $width = null, $height = null)
+    {
+        $args = [
+            'qrData' => $qrData,
+            'width' => $width,
+            'height' => $height,
+            'authToken' => $authToken
+        ];
+
+        return parent::createPayeeQr($args);
+    }
+
+    public function createPayeeQrExtension($qrHeaderUUID, $extensionData, $authToken)
+    {
+        $args = [
+            'qrHeaderUUID' => $qrHeaderUUID,
+            'extensionData' => $extensionData,
+            'authToken' => $authToken
+        ];
+
+        return parent::createPayeeQrExtension($args);
+    }
+
+    public function cancelPayeeQr($qrHeaderUUID, $authToken)
+    {
+        $args = [
+            'qrHeaderUUID' => $qrHeaderUUID,
+            'authToken' => $authToken
+        ];
+
+        return parent::cancelPayeeQr($args);
+    }
+
+    public function cancelHybrExtension($qrHeaderUUID, $authToken)
+    {
+        $args = [
+            'qrHeaderUUID' => $qrHeaderUUID,
+            'authToken' => $authToken
+        ];
+
+        return parent::cancelHybrExtension($args);
+    }
+
+    public function getPayeeQrStatus($qrHeaderUUID, $authToken, $nbOfExt = null, $nbOfTxs = null)
+    {
+        $args = [
+            'qrHeaderUUID' => $qrHeaderUUID,
+            'nbOfExt' => $nbOfExt,
+            'nbOfTxs' => $nbOfTxs,
+            'authToken' => $authToken
+        ];
+
+        return parent::getPayeeQrStatus($args);
+    }
+
+    public function getQrExtensionStatus($qrExtensionUUID, $authToken, $nbOfTxs = null)
+    {
+        $args = [
+            'qrHeaderUUID' => $qrExtensionUUID,
+            'nbOfTxs' => $nbOfTxs,
+            'authToken' => $authToken
+        ];
+
+        return parent::getQrExtensionStatus($args);
+    }
+
+    public function getReconciliationTransactions($authToken, $dateFrom = null, $dateTo = null, $messageId = null)
+    {
+        $args = [
+            'dateFrom' => $dateFrom,
+            'dateTo' => $dateTo,
+            'messageId' => $messageId,
+            'authToken' => $authToken
+        ];
+
+        return parent::getReconciliationTransactions($args);
+    }
+
+    public function getSignal($qrExtensionUUID, $authToken)
+    {
+        $args = [
+            'qrExtensionUUID' => $qrExtensionUUID,
+            'authToken' => $authToken
+        ];
+
+        return parent::getSignal($args);
+    }
+
+    public function reverseTransaction($id, $authToken)
+    {
+        $args = [
+            'id' => $id,
+            'authToken' => $authToken
+        ];
+
+        return parent::reverseTransaction($args);
+    }
 }
