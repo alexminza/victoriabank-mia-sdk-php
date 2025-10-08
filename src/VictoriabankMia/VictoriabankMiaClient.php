@@ -30,6 +30,23 @@ class VictoriabankMiaClient extends GuzzleClient
         parent::__construct($client, $description, null, null, null, $config);
     }
 
+    public function getHealthStatus()
+    {
+        return parent::getHealthStatus();
+    }
+
+    public function getToken($grant_type, $username, $password, $refresh_token = null)
+    {
+        $args = [
+            'grant_type' => $grant_type,
+            'username' => $username,
+            'password' => $password,
+            'refresh_token' => $refresh_token
+        ];
+
+        return parent::getToken($args);
+    }
+
     public function createPayeeQr($qrData, $authToken, $width = null, $height = null)
     {
         $args = [
