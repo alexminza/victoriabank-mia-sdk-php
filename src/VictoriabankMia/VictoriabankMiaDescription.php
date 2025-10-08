@@ -8,6 +8,14 @@ class VictoriabankMiaDescription extends Description
 {
     public function __construct(array $options = [])
     {
+        $authorizationHeader = [
+            'type' => 'string',
+            'location' => 'header',
+            'sentAs' => 'Authorization',
+            'description' => 'Bearer Authentication with JWT Token"',
+            'required' => true,
+        ];
+
         $description = [
             'baseUrl' => 'https://ips-api-pj.vb.md/',
             'name' => 'IPS Business WebApi',
@@ -18,89 +26,6 @@ class VictoriabankMiaDescription extends Description
                 'getHealthStatus' => [
                     'httpMethod' => 'GET',
                     'uri' => '/api/v1/health/status',
-                ],
-
-                // QR Operations
-                'createPayeeQr' => [
-                    'httpMethod' => 'POST',
-                    'uri' => '/api/v1/qr',
-                    'summary' => 'CreatePayeeQr - Register new payee-presented QR code',
-                    'responseModel' => 'CreatePayeeQrResponse',
-                    'parameters' => [
-                        'width' => ['type' => 'integer', 'location' => 'query', 'description' => 'QR code image width (Default: 300)'],
-                        'height' => ['type' => 'integer', 'location' => 'query', 'description' => 'QR code image height (Default: 300)'],
-                        'qrData' => ['location' => 'json', 'schema' => ['$ref' => 'VbPayeeQrDto']],
-                    ],
-                ],
-                'createPayeeQrExtension' => [
-                    'httpMethod' => 'POST',
-                    'uri' => '/api/v1/qr/{qrHeaderUUID}/extentions',
-                    'summary' => 'CreatePayeeQrExtention - Register new extension for HYBR or STAT payee-presented QR code',
-                    'responseModel' => 'StringResponse',
-                    'parameters' => [
-                        'qrHeaderUUID' => ['type' => 'string', 'location' => 'uri', 'required' => true],
-                        'extensionData' => ['location' => 'json', 'schema' => ['$ref' => 'VbPayeeQrExtensionDto']],
-                    ],
-                ],
-                'cancelPayeeQr' => [
-                    'httpMethod' => 'DELETE',
-                    'uri' => '/api/v1/qr/{qrHeaderUUID}',
-                    'summary' => 'CancelPayeeQr-Cancel payee-resented QR code',
-                    'parameters' => [
-                        'qrHeaderUUID' => ['type' => 'string', 'location' => 'uri', 'required' => true],
-                    ],
-                ],
-                'cancelHybrExtension' => [
-                    'httpMethod' => 'DELETE',
-                    'uri' => '/api/v1/qr/{qrHeaderUUID}/active-extension',
-                    'summary' => 'Cancel active extension of hybrid payee-presented QR code',
-                    'parameters' => [
-                        'qrHeaderUUID' => ['type' => 'string', 'location' => 'uri', 'required' => true],
-                    ],
-                ],
-                'getPayeeQrStatus' => [
-                    'httpMethod' => 'GET',
-                    'uri' => '/api/v1/qr/{qrHeaderUUID}/status',
-                    'summary' => 'Get status of payee-presented QR code header',
-                    'responseModel' => 'PayeeQrStatusDto',
-                    'parameters' => [
-                        'qrHeaderUUID' => ['type' => 'string', 'location' => 'uri', 'required' => true],
-                        'nbOfExt' => ['type' => 'integer', 'location' => 'query'],
-                        'nbOfTxs' => ['type' => 'integer', 'location' => 'query'],
-                    ],
-                ],
-                'getQrExtensionStatus' => [
-                    'httpMethod' => 'GET',
-                    'uri' => '/api/v1/qr-extensions/{qrExtensionUUID}/status',
-                    'summary' => 'Get status of QR code extension',
-                    'responseModel' => 'PayeeQrExtensionStatusDto',
-                    'parameters' => [
-                        'qrExtensionUUID' => ['type' => 'string', 'location' => 'uri', 'required' => true],
-                        'nbOfTxs' => ['type' => 'integer', 'location' => 'query'],
-                    ],
-                ],
-
-                // Reconciliation Operations
-                'getReconciliationTransactions' => [
-                    'httpMethod' => 'GET',
-                    'uri' => '/api/v1/reconciliation/transactions',
-                    'summary' => 'Transaction list for reconciliation',
-                    'responseModel' => 'TransactionListDto',
-                    'parameters' => [
-                        'dateFrom' => ['type' => 'string', 'format' => 'date-time', 'location' => 'query'],
-                        'dateTo' => ['type' => 'string', 'format' => 'date-time', 'location' => 'query'],
-                        'messageId' => ['type' => 'string', 'location' => 'query'],
-                    ],
-                ],
-
-                // Signal Operations
-                'getSignal' => [
-                    'httpMethod' => 'GET',
-                    'uri' => '/api/v1/signal/{qrExtensionUUID}',
-                    'responseModel' => 'SignalDto',
-                    'parameters' => [
-                        'qrExtensionUUID' => ['type' => 'string', 'location' => 'uri', 'required' => true],
-                    ],
                 ],
 
                 // Token Operations
@@ -116,16 +41,109 @@ class VictoriabankMiaDescription extends Description
                     ],
                 ],
 
+                // QR Operations
+                'createPayeeQr' => [
+                    'httpMethod' => 'POST',
+                    'uri' => '/api/v1/qr',
+                    'summary' => 'CreatePayeeQr - Register new payee-presented QR code',
+                    'responseModel' => 'CreatePayeeQrResponse',
+                    'parameters' => [
+                        'authToken' => $authorizationHeader,
+                        'width' => ['type' => 'integer', 'location' => 'query', 'description' => 'QR code image width (Default: 300)'],
+                        'height' => ['type' => 'integer', 'location' => 'query', 'description' => 'QR code image height (Default: 300)'],
+                        'qrData' => ['location' => 'json', 'schema' => ['$ref' => 'VbPayeeQrDto']],
+                    ],
+                ],
+                'createPayeeQrExtension' => [
+                    'httpMethod' => 'POST',
+                    'uri' => '/api/v1/qr/{qrHeaderUUID}/extentions',
+                    'summary' => 'CreatePayeeQrExtention - Register new extension for HYBR or STAT payee-presented QR code',
+                    'responseModel' => 'StringResponse',
+                    'parameters' => [
+                        'authToken' => $authorizationHeader,
+                        'qrHeaderUUID' => ['type' => 'string', 'location' => 'uri', 'required' => true],
+                        'extensionData' => ['location' => 'json', 'schema' => ['$ref' => 'VbPayeeQrExtensionDto']],
+                    ],
+                ],
+                'cancelPayeeQr' => [
+                    'httpMethod' => 'DELETE',
+                    'uri' => '/api/v1/qr/{qrHeaderUUID}',
+                    'summary' => 'CancelPayeeQr-Cancel payee-resented QR code',
+                    'parameters' => [
+                        'authToken' => $authorizationHeader,
+                        'qrHeaderUUID' => ['type' => 'string', 'location' => 'uri', 'required' => true],
+                    ],
+                ],
+                'cancelHybrExtension' => [
+                    'httpMethod' => 'DELETE',
+                    'uri' => '/api/v1/qr/{qrHeaderUUID}/active-extension',
+                    'summary' => 'Cancel active extension of hybrid payee-presented QR code',
+                    'parameters' => [
+                        'authToken' => $authorizationHeader,
+                        'qrHeaderUUID' => ['type' => 'string', 'location' => 'uri', 'required' => true],
+                    ],
+                ],
+                'getPayeeQrStatus' => [
+                    'httpMethod' => 'GET',
+                    'uri' => '/api/v1/qr/{qrHeaderUUID}/status',
+                    'summary' => 'Get status of payee-presented QR code header',
+                    'responseModel' => 'PayeeQrStatusDto',
+                    'parameters' => [
+                        'authToken' => $authorizationHeader,
+                        'qrHeaderUUID' => ['type' => 'string', 'location' => 'uri', 'required' => true],
+                        'nbOfExt' => ['type' => 'integer', 'location' => 'query'],
+                        'nbOfTxs' => ['type' => 'integer', 'location' => 'query'],
+                    ],
+                ],
+                'getQrExtensionStatus' => [
+                    'httpMethod' => 'GET',
+                    'uri' => '/api/v1/qr-extensions/{qrExtensionUUID}/status',
+                    'summary' => 'Get status of QR code extension',
+                    'responseModel' => 'PayeeQrExtensionStatusDto',
+                    'parameters' => [
+                        'authToken' => $authorizationHeader,
+                        'qrExtensionUUID' => ['type' => 'string', 'location' => 'uri', 'required' => true],
+                        'nbOfTxs' => ['type' => 'integer', 'location' => 'query'],
+                    ],
+                ],
+
+                // Reconciliation Operations
+                'getReconciliationTransactions' => [
+                    'httpMethod' => 'GET',
+                    'uri' => '/api/v1/reconciliation/transactions',
+                    'summary' => 'Transaction list for reconciliation',
+                    'responseModel' => 'TransactionListDto',
+                    'parameters' => [
+                        'authToken' => $authorizationHeader,
+                        'dateFrom' => ['type' => 'string', 'format' => 'date-time', 'location' => 'query'],
+                        'dateTo' => ['type' => 'string', 'format' => 'date-time', 'location' => 'query'],
+                        'messageId' => ['type' => 'string', 'location' => 'query'],
+                    ],
+                ],
+
+                // Signal Operations
+                'getSignal' => [
+                    'httpMethod' => 'GET',
+                    'uri' => '/api/v1/signal/{qrExtensionUUID}',
+                    'responseModel' => 'SignalDto',
+                    'parameters' => [
+                        'authToken' => $authorizationHeader,
+                        'qrExtensionUUID' => ['type' => 'string', 'location' => 'uri', 'required' => true],
+                    ],
+                ],
+
                 // Transaction Operations
                 'reverseTransaction' => [
                     'httpMethod' => 'DELETE',
                     'uri' => '/api/v1/transaction/{id}',
                     'summary' => 'Reverse already processed transaction',
                     'parameters' => [
+                        'authToken' => $authorizationHeader,
                         'id' => ['type' => 'string', 'location' => 'uri', 'required' => true],
                     ],
                 ],
             ],
+
             'models' => [
                 // Generic Models
                 'StringResponse' => ['type' => 'object', 'properties' => ['result' => ['type' => 'string', 'location' => 'json']]],
