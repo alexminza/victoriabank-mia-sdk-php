@@ -12,7 +12,7 @@ class VictoriabankMiaDescription extends Description
             'type' => 'string',
             'location' => 'header',
             'sentAs' => 'Authorization',
-            'description' => 'Bearer Authentication with JWT Token"',
+            'description' => 'Bearer Authentication with JWT Token',
             'required' => true,
         ];
 
@@ -34,10 +34,10 @@ class VictoriabankMiaDescription extends Description
                     'uri' => '/identity/token',
                     'summary' => 'Get tokens',
                     'parameters' => [
-                        'grant_type' => ['type' => 'string', 'location' => 'postField'],
-                        'username' => ['type' => 'string', 'location' => 'postField'],
-                        'password' => ['type' => 'string', 'location' => 'postField'],
-                        'refresh_token' => ['type' => 'string', 'location' => 'postField'],
+                        'grant_type' => ['type' => 'string', 'location' => 'formParam'],
+                        'username' => ['type' => 'string', 'location' => 'formParam'],
+                        'password' => ['type' => 'string', 'location' => 'formParam'],
+                        'refresh_token' => ['type' => 'string', 'location' => 'formParam'],
                     ],
                 ],
 
