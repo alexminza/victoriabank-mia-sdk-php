@@ -47,13 +47,16 @@ class VictoriabankMiaDescription extends Description
                     'httpMethod' => 'POST',
                     'uri' => '/api/v1/qr',
                     'summary' => 'CreatePayeeQr - Register new payee-presented QR code',
-                    'responseModel' => 'CreatePayeeQrResponse',
+                    'responseModel' => 'getResponse', #'CreatePayeeQrResponse',
                     'parameters' => [
                         'authToken' => $authorizationHeader,
                         'width' => ['type' => 'integer', 'location' => 'query', 'description' => 'QR code image width (Default: 300)'],
                         'height' => ['type' => 'integer', 'location' => 'query', 'description' => 'QR code image height (Default: 300)'],
-                        'qrData' => ['location' => 'json', 'schema' => ['$ref' => 'VbPayeeQrDto']],
                     ],
+                    'additionalParameters' => [
+                        'location' => 'json',
+                        'schema' => ['$ref' => 'VbPayeeQrDto']
+                    ]
                 ],
                 'createPayeeQrExtension' => [
                     'httpMethod' => 'POST',

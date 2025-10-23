@@ -52,11 +52,10 @@ class VictoriabankMiaClient extends GuzzleClient
 
     public function createPayeeQr($qrData, $authToken, $width = null, $height = null)
     {
-        $args = [
-            'qrData' => $qrData,
-            'width' => $width,
-            'height' => $height,
-        ];
+        $args = $qrData;
+
+        $args['width'] = $width;
+        $args['height'] = $height;
 
         self::setBearerAuthToken($args, $authToken);
         return parent::createPayeeQr($args);
