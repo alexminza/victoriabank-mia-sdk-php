@@ -91,7 +91,7 @@ class VictoriabankMiaDescription extends Description
                     'httpMethod' => 'GET',
                     'uri' => '/api/v1/qr/{qrHeaderUUID}/status',
                     'summary' => 'Get status of payee-presented QR code header',
-                    'responseModel' => 'PayeeQrStatusDto',
+                    'responseModel' => 'getResponse', #'PayeeQrStatusDto',
                     'parameters' => [
                         'authToken' => $authorizationHeader,
                         'qrHeaderUUID' => ['type' => 'string', 'location' => 'uri', 'required' => true],
@@ -103,7 +103,7 @@ class VictoriabankMiaDescription extends Description
                     'httpMethod' => 'GET',
                     'uri' => '/api/v1/qr-extensions/{qrExtensionUUID}/status',
                     'summary' => 'Get status of QR code extension',
-                    'responseModel' => 'PayeeQrExtensionStatusDto',
+                    'responseModel' => 'getResponse', #'PayeeQrExtensionStatusDto',
                     'parameters' => [
                         'authToken' => $authorizationHeader,
                         'qrExtensionUUID' => ['type' => 'string', 'location' => 'uri', 'required' => true],
@@ -116,7 +116,7 @@ class VictoriabankMiaDescription extends Description
                     'httpMethod' => 'GET',
                     'uri' => '/api/v1/reconciliation/transactions',
                     'summary' => 'Transaction list for reconciliation',
-                    'responseModel' => 'TransactionListDto',
+                    'responseModel' => 'getResponse', #'TransactionListDto',
                     'parameters' => [
                         'authToken' => $authorizationHeader,
                         'dateFrom' => ['type' => 'string', 'format' => 'date-time', 'location' => 'query'],
@@ -129,7 +129,7 @@ class VictoriabankMiaDescription extends Description
                 'getSignal' => [
                     'httpMethod' => 'GET',
                     'uri' => '/api/v1/signal/{qrExtensionUUID}',
-                    'responseModel' => 'SignalDto',
+                    'responseModel' => 'getResponse', #'SignalDto',
                     'parameters' => [
                         'authToken' => $authorizationHeader,
                         'qrExtensionUUID' => ['type' => 'string', 'location' => 'uri', 'required' => true],
