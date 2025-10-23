@@ -56,9 +56,9 @@ class VictoriabankMiaClient extends GuzzleClient
             'qrData' => $qrData,
             'width' => $width,
             'height' => $height,
-            'authToken' => $authToken
         ];
 
+        self::setBearerAuthToken($args, $authToken);
         return parent::createPayeeQr($args);
     }
 
@@ -67,9 +67,9 @@ class VictoriabankMiaClient extends GuzzleClient
         $args = [
             'qrHeaderUUID' => $qrHeaderUUID,
             'extensionData' => $extensionData,
-            'authToken' => $authToken
         ];
 
+        self::setBearerAuthToken($args, $authToken);
         return parent::createPayeeQrExtension($args);
     }
 
@@ -77,9 +77,9 @@ class VictoriabankMiaClient extends GuzzleClient
     {
         $args = [
             'qrHeaderUUID' => $qrHeaderUUID,
-            'authToken' => $authToken
         ];
 
+        self::setBearerAuthToken($args, $authToken);
         return parent::cancelPayeeQr($args);
     }
 
@@ -87,9 +87,9 @@ class VictoriabankMiaClient extends GuzzleClient
     {
         $args = [
             'qrHeaderUUID' => $qrHeaderUUID,
-            'authToken' => $authToken
         ];
 
+        self::setBearerAuthToken($args, $authToken);
         return parent::cancelHybrExtension($args);
     }
 
@@ -99,9 +99,9 @@ class VictoriabankMiaClient extends GuzzleClient
             'qrHeaderUUID' => $qrHeaderUUID,
             'nbOfExt' => $nbOfExt,
             'nbOfTxs' => $nbOfTxs,
-            'authToken' => $authToken
         ];
 
+        self::setBearerAuthToken($args, $authToken);
         return parent::getPayeeQrStatus($args);
     }
 
@@ -110,9 +110,9 @@ class VictoriabankMiaClient extends GuzzleClient
         $args = [
             'qrHeaderUUID' => $qrExtensionUUID,
             'nbOfTxs' => $nbOfTxs,
-            'authToken' => $authToken
         ];
 
+        self::setBearerAuthToken($args, $authToken);
         return parent::getQrExtensionStatus($args);
     }
 
@@ -122,9 +122,9 @@ class VictoriabankMiaClient extends GuzzleClient
             'dateFrom' => $dateFrom,
             'dateTo' => $dateTo,
             'messageId' => $messageId,
-            'authToken' => $authToken
         ];
 
+        self::setBearerAuthToken($args, $authToken);
         return parent::getReconciliationTransactions($args);
     }
 
@@ -132,9 +132,9 @@ class VictoriabankMiaClient extends GuzzleClient
     {
         $args = [
             'qrExtensionUUID' => $qrExtensionUUID,
-            'authToken' => $authToken
         ];
 
+        self::setBearerAuthToken($args, $authToken);
         return parent::getSignal($args);
     }
 
@@ -142,10 +142,19 @@ class VictoriabankMiaClient extends GuzzleClient
     {
         $args = [
             'id' => $id,
-            'authToken' => $authToken
         ];
 
+        self::setBearerAuthToken($args, $authToken);
         return parent::reverseTransaction($args);
+    }
+
+    /**
+     * @param array  $args
+     * @param string $authToken
+     */
+    private static function setBearerAuthToken(&$args, $authToken)
+    {
+        $args['authToken'] = "Bearer $authToken";
     }
 
     /**
