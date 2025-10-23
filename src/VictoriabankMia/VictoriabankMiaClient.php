@@ -9,6 +9,9 @@ use GuzzleHttp\Command\Guzzle\GuzzleClient;
 use GuzzleHttp\Command\Result;
 use GuzzleHttp\Exception\BadResponseException;
 
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+
 class VictoriabankMiaClient extends GuzzleClient
 {
     const DEFAULT_BASE_URL = 'https://ips-api-pj.vb.md/';
@@ -143,5 +146,19 @@ class VictoriabankMiaClient extends GuzzleClient
         ];
 
         return parent::reverseTransaction($args);
+    }
+
+    /**
+     * Callback Payload Decoding and Signature Verification
+     * @param string $callbackJwt
+     * @param string $certificate
+     */
+    public static function decodeValidateCallback($callbackJwt, $certificate)
+    {
+        $algorithm = 'RS256';
+        $publicKey = openssl_pkey_get_public($certificate);
+        $decoded_payload = JWT::decode($callbackJwt, new Key($publicKey, $algorithm));
+
+        return $decoded_payload;
     }
 }
