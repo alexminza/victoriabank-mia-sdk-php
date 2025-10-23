@@ -17,7 +17,7 @@ class VictoriabankMiaDescription extends Description
         ];
 
         $description = [
-            'baseUrl' => 'https://ips-api-pj.vb.md/',
+            //'baseUrl' => 'https://ips-api-pj.vb.md/',
             'name' => 'IPS Business WebApi',
             'version' => 'v1.0',
 
