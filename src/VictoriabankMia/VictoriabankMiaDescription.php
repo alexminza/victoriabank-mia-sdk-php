@@ -33,6 +33,7 @@ class VictoriabankMiaDescription extends Description
                     'httpMethod' => 'POST',
                     'uri' => '/identity/token',
                     'summary' => 'Get tokens',
+                    'responseModel' => 'getResponse',
                     'parameters' => [
                         'grant_type' => ['type' => 'string', 'location' => 'formParam'],
                         'username' => ['type' => 'string', 'location' => 'formParam'],
@@ -58,7 +59,7 @@ class VictoriabankMiaDescription extends Description
                     'httpMethod' => 'POST',
                     'uri' => '/api/v1/qr/{qrHeaderUUID}/extentions',
                     'summary' => 'CreatePayeeQrExtention - Register new extension for HYBR or STAT payee-presented QR code',
-                    'responseModel' => 'StringResponse',
+                    'responseModel' => 'getResponse',
                     'parameters' => [
                         'authToken' => $authorizationHeader,
                         'qrHeaderUUID' => ['type' => 'string', 'location' => 'uri', 'required' => true],
@@ -146,7 +147,12 @@ class VictoriabankMiaDescription extends Description
 
             'models' => [
                 // Generic Models
-                'StringResponse' => ['type' => 'object', 'properties' => ['result' => ['type' => 'string', 'location' => 'json']]],
+                'getResponse' => [
+                    'type' => 'object',
+                    'additionalProperties' => [
+                        'location' => 'json'
+                    ]
+                ],
 
                 // Schema-based Models
                 'CreatePayeeQrResponse' => [
