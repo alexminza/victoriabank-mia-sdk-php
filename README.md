@@ -91,7 +91,7 @@ $qrData = array(
     )
 );
 
-$createQrResponse = $vbMiaClient->createPayeeQr($qrData, $authToken);
+$createQrResponse = $vbMiaClient->createPayeeQr($qrData, $accessToken);
 print_r($createQrResponse);
 ```
 
@@ -109,5 +109,5 @@ print_r($callbackData);
 
 ```php
 $paymentTransactionId = VictoriabankMiaClient::getPaymentTransactionId($callbackData->payment->reference);
-$vbMiaClient->reverseTransaction($paymentTransactionId, $authToken);
+$vbMiaClient->reverseTransaction($paymentTransactionId, $accessToken);
 ```
