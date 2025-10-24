@@ -6,12 +6,15 @@ use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Command\Guzzle\DescriptionInterface;
 use GuzzleHttp\Command\Guzzle\GuzzleClient;
-use GuzzleHttp\Command\Result;
-use GuzzleHttp\Exception\BadResponseException;
 
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 
+/**
+ * Victoriabank MIA API client
+ * @link https://test-ipspj.victoriabank.md
+ * @link https://test-ipspj-demopay.victoriabank.md/swagger/
+ */
 class VictoriabankMiaClient extends GuzzleClient
 {
     const DEFAULT_BASE_URL = 'https://ips-api-pj.vb.md/';

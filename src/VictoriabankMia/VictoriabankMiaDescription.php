@@ -4,6 +4,11 @@ namespace Victoriabank\VictoriabankMia;
 
 use GuzzleHttp\Command\Guzzle\Description;
 
+/**
+ * Victoriabank MIA API service description
+ * @link https://test-ipspj.victoriabank.md
+ * @link https://test-ipspj-demopay.victoriabank.md/swagger/
+ */
 class VictoriabankMiaDescription extends Description
 {
     public function __construct(array $options = [])
