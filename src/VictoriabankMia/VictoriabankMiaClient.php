@@ -157,7 +157,7 @@ class VictoriabankMiaClient extends GuzzleClient
     }
 
     /**
-     * Callback Payload Decoding and Signature Verification
+     * Decode callback payload and verify signature.
      * @param string $callbackJwt
      * @param string $certificate
      */
@@ -168,5 +168,33 @@ class VictoriabankMiaClient extends GuzzleClient
         $decoded_payload = JWT::decode($callbackJwt, new Key($publicKey, $algorithm));
 
         return $decoded_payload;
+    }
+
+    /**
+     * Extract payment transaction ID from payment reference string.
+     * @param string $paymentReference
+     */
+    public static function getPaymentTransactionId($paymentReference)
+    {
+        //NOTE: Victoriabank MIA API provides only a composed reference string that needs to be parsed
+        $transactionComponents = explode('|', $paymentReference);
+        $transactionId = $transactionComponents[3];
+
+        return $transactionId;
+    }
+
+    /**
+     * Extract payment RRN (Retrieval Reference Number).
+     * @param string $paymentReference
+     */
+    public static function getPaymentRrn($paymentReference)
+    {
+        //NOTE: Victoriabank MIA API provides only a composed transaction string that needs to be parsed
+        $transactionId = self::getPaymentTransactionId($paymentReference);
+        $paymentRrn = strlen($transactionId) < 12
+            ? $transactionId
+            : substr($transactionId, -12);
+
+        return $paymentRrn;
     }
 }
