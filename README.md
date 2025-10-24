@@ -104,3 +104,10 @@ $callbackBody = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaWduYWxDb2RlIjoiRXhwaX
 $callbackData = VictoriabankMiaClient::decodeValidateCallback($callbackBody, $vbCertificate);
 print_r($callbackData);
 ```
+
+### Refund payment
+
+```php
+$paymentTransactionId = VictoriabankMiaClient::getPaymentTransactionId($callbackData->payment->reference);
+$vbMiaClient->reverseTransaction($paymentTransactionId, $authToken);
+```
