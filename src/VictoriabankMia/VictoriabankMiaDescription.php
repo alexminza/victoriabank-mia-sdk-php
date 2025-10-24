@@ -66,8 +66,11 @@ class VictoriabankMiaDescription extends Description
                     'parameters' => [
                         'authToken' => $authorizationHeader,
                         'qrHeaderUUID' => ['type' => 'string', 'location' => 'uri', 'required' => true],
-                        'extensionData' => ['location' => 'json', 'schema' => ['$ref' => 'VbPayeeQrExtensionDto']],
                     ],
+                    'additionalParameters' => [
+                        'location' => 'json',
+                        'schema' => ['$ref' => 'VbPayeeQrExtensionDto']
+                    ]
                 ],
                 'cancelPayeeQr' => [
                     'httpMethod' => 'DELETE',

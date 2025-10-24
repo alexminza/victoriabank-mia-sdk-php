@@ -33,11 +33,22 @@ class VictoriabankMiaClient extends GuzzleClient
         parent::__construct($client, $description, null, null, null, $config);
     }
 
+    /**
+     * @link https://test-ipspj.victoriabank.md/index.html#operations-Health-get_api_v1_health_status
+     */
     public function getHealthStatus()
     {
         return parent::getHealthStatus();
     }
 
+    /**
+     * Get tokens.
+     * @link https://test-ipspj.victoriabank.md/index.html#operations-Token-post_identity_token
+     * @param string $grant_type
+     * @param string $username
+     * @param string $password
+     * @param string $refresh_token
+     */
     public function getToken($grant_type, $username, $password, $refresh_token = null)
     {
         $args = [
@@ -50,6 +61,14 @@ class VictoriabankMiaClient extends GuzzleClient
         return parent::getToken($args);
     }
 
+    /**
+     * Register new payee-presented QR code.
+     * @link https://test-ipspj.victoriabank.md/index.html#operations-Qr-post_api_v1_qr
+     * @param array  $qrData
+     * @param string $authToken
+     * @param int    $width
+     * @param int    $height
+     */
     public function createPayeeQr($qrData, $authToken, $width = null, $height = null)
     {
         $args = $qrData;
@@ -61,17 +80,29 @@ class VictoriabankMiaClient extends GuzzleClient
         return parent::createPayeeQr($args);
     }
 
+    /**
+     * Register new extension for HYBR or STAT payee-presented QR code.
+     * @link https://test-ipspj.victoriabank.md/index.html#operations-Qr-post_api_v1_qr__qrHeaderUUID__extentions
+     * @param string $qrHeaderUUID
+     * @param array  $extensionData
+     * @param string $authToken
+     */
     public function createPayeeQrExtension($qrHeaderUUID, $extensionData, $authToken)
     {
-        $args = [
-            'qrHeaderUUID' => $qrHeaderUUID,
-            'extensionData' => $extensionData,
-        ];
+        $args = $extensionData;
+
+        $args['qrHeaderUUID'] = $qrHeaderUUID;
 
         self::setBearerAuthToken($args, $authToken);
         return parent::createPayeeQrExtension($args);
     }
 
+    /**
+     * Cancel payee-resented QR code, including active extension, if exists.
+     * @link https://test-ipspj.victoriabank.md/index.html#operations-Qr-delete_api_v1_qr__qrHeaderUUID_
+     * @param string $qrHeaderUUID
+     * @param string $authToken
+     */
     public function cancelPayeeQr($qrHeaderUUID, $authToken)
     {
         $args = [
@@ -82,6 +113,12 @@ class VictoriabankMiaClient extends GuzzleClient
         return parent::cancelPayeeQr($args);
     }
 
+    /**
+     * Cancel active extension of hybrid payee-presented QR code.
+     * @link https://test-ipspj.victoriabank.md/index.html#operations-Qr-delete_api_v1_qr__qrHeaderUUID__active_extension
+     * @param string $qrHeaderUUID
+     * @param string $authToken
+     */
     public function cancelHybrExtension($qrHeaderUUID, $authToken)
     {
         $args = [
@@ -92,6 +129,14 @@ class VictoriabankMiaClient extends GuzzleClient
         return parent::cancelHybrExtension($args);
     }
 
+    /**
+     * Get status of payee-presented QR code header, statuses of N last extensions and list of M last payments against each extension.
+     * @link https://test-ipspj.victoriabank.md/index.html#operations-Qr-get_api_v1_qr__qrHeaderUUID__status
+     * @param string $qrHeaderUUID
+     * @param string $authToken
+     * @param int    $nbOfExt
+     * @param int    $nbOfTxs
+     */
     public function getPayeeQrStatus($qrHeaderUUID, $authToken, $nbOfExt = null, $nbOfTxs = null)
     {
         $args = [
@@ -104,6 +149,13 @@ class VictoriabankMiaClient extends GuzzleClient
         return parent::getPayeeQrStatus($args);
     }
 
+    /**
+     * Get status of QR code extension and list of last N payments against it.
+     * @link https://test-ipspj.victoriabank.md/index.html#operations-Qr-get_api_v1_qr_extensions__qrExtensionUUID__status
+     * @param string $qrExtensionUUID
+     * @param string $authToken
+     * @param int    $nbOfTxs
+     */
     public function getQrExtensionStatus($qrExtensionUUID, $authToken, $nbOfTxs = null)
     {
         $args = [
@@ -115,6 +167,14 @@ class VictoriabankMiaClient extends GuzzleClient
         return parent::getQrExtensionStatus($args);
     }
 
+    /**
+     * Transaction list for reconciliation.
+     * @link https://test-ipspj.victoriabank.md/index.html#operations-Reconciliation-get_api_v1_reconciliation_transactions
+     * @param string $authToken
+     * @param string $dateFrom
+     * @param string $dateTo
+     * @param string $messageId
+     */
     public function getReconciliationTransactions($authToken, $dateFrom = null, $dateTo = null, $messageId = null)
     {
         $args = [
@@ -127,6 +187,12 @@ class VictoriabankMiaClient extends GuzzleClient
         return parent::getReconciliationTransactions($args);
     }
 
+    /**
+     * Get Last Signal by QR Extension UUID.
+     * @link https://test-ipspj.victoriabank.md/index.html#operations-Signal-get_api_v1_signal__qrExtensionUUID_
+     * @param string $qrExtensionUUID
+     * @param string $authToken
+     */
     public function getSignal($qrExtensionUUID, $authToken)
     {
         $args = [
@@ -137,6 +203,12 @@ class VictoriabankMiaClient extends GuzzleClient
         return parent::getSignal($args);
     }
 
+    /**
+     * Reverse already processed transaction.
+     * @link https://test-ipspj.victoriabank.md/index.html#operations-Transaction-delete_api_v1_transaction__id_
+     * @param string $id
+     * @param string $authToken
+     */
     public function reverseTransaction($id, $authToken)
     {
         $args = [
