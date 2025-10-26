@@ -2,6 +2,7 @@
 * Victoriabank IPS Business WebApi docs: https://test-ipspj.victoriabank.md
 * Victoriabank IPS DemoPay WebApi https://test-ipspj-demopay.victoriabank.md/swagger/
 * GitHub project https://github.com/alexminza/victoriabank-mia-sdk-php
+* Composer package https://packagist.org/packages/alexminza/victoriabank-mia-sdk
 
 ## Installation
 To easily install or upgrade to the latest release, use `composer`:
@@ -103,6 +104,14 @@ $callbackBody = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaWduYWxDb2RlIjoiRXhwaX
 
 $callbackData = VictoriabankMiaClient::decodeValidateCallback($callbackBody, $vbCertificate);
 print_r($callbackData);
+```
+
+### Get QR status
+
+```php
+$qrHeaderUUID = $createQrResponse['qrHeaderUUID'];
+$getPayeeQrStatusResponse = $client->getPayeeQrStatus($qrHeaderUUID, $accessToken);
+print_r($getPayeeQrStatusResponse);
 ```
 
 ### Refund payment
