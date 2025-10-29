@@ -106,10 +106,17 @@ $callbackData = VictoriabankMiaClient::decodeValidateCallback($callbackBody, $vb
 print_r($callbackData);
 ```
 
-### Get QR status
+### Perform a test QR payment
 
 ```php
 $qrHeaderUUID = $createQrResponse['qrHeaderUUID'];
+$demoPayResponse = $client->demoPay($qrHeaderUUID, $accessToken);
+print_r($demoPayResponse);
+```
+
+### Get QR status
+
+```php
 $getPayeeQrStatusResponse = $client->getPayeeQrStatus($qrHeaderUUID, $accessToken);
 print_r($getPayeeQrStatusResponse);
 ```
