@@ -154,6 +154,21 @@ class VictoriabankMiaDescription extends Description
                         'id' => ['type' => 'string', 'location' => 'uri', 'required' => true],
                     ],
                 ],
+
+                // Demo Payment Operations
+                'demoPay' => [
+                    'httpMethod' => 'POST',
+                    'uri' => '/api/pay',
+                    'summary' => 'Demo Pay (Test)',
+                    'responseModel' => 'getResponse',
+                    'parameters' => [
+                        'authToken' => $authorizationHeader,
+                    ],
+                    'additionalParameters' => [
+                        'location' => 'json',
+                        'schema' => ['$ref' => 'DemoPayDto']
+                    ]
+                ],
             ],
 
             'models' => [
@@ -299,6 +314,13 @@ class VictoriabankMiaDescription extends Description
                         'qrType' => ['type' => 'string', 'enum' => ['DYNM', 'STAT', 'HYBR']],
                         'amountType' => ['type' => 'string', 'enum' => ['Fixed', 'Controlled', 'Free']],
                         'pmtContext' => ['type' => ['string', 'null']],
+                    ],
+                ],
+                'DemoPayDto' => [
+                    'type' => 'object',
+                    'additionalProperties' => false,
+                    'properties' => [
+                        'qrHeaderUUID' => ['type' => 'string', 'required' => true],
                     ],
                 ],
             ],

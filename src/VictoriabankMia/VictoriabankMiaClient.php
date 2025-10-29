@@ -19,7 +19,7 @@ class VictoriabankMiaClient extends GuzzleClient
 {
     const DEFAULT_BASE_URL = 'https://ips-api-pj.vb.md/';
     const TEST_BASE_URL = 'https://test-ipspj.victoriabank.md/';
-    const TEST_DEMOPAY_URL = 'https://test-ipspj-demopay.victoriabank.md/api/pay/';
+    const TEST_DEMOPAY_URL = 'https://test-ipspj-demopay.victoriabank.md/';
 
     /**
      * @param ClientInterface      $client
@@ -220,6 +220,25 @@ class VictoriabankMiaClient extends GuzzleClient
 
         self::setBearerAuthToken($args, $authToken);
         return parent::reverseTransaction($args);
+    }
+
+    /**
+     * Demo Pay (Test)
+     * @link https://test-ipspj-demopay.victoriabank.md/swagger/index.html#operations-Pay-post_api_Pay
+     * @param string $qrHeaderUUID
+     * @param string $authToken
+     */
+    public function demoPay($qrHeaderUUID, $authToken)
+    {
+        $args = [
+            'qrHeaderUUID' => $qrHeaderUUID,
+            '@http' => [
+                'base_uri' => self::TEST_DEMOPAY_URL
+            ]
+        ];
+
+        self::setBearerAuthToken($args, $authToken);
+        return parent::demoPay($args);
     }
 
     /**
