@@ -1,4 +1,7 @@
 # PHP SDK for Victoriabank MIA API
+
+![Victoriabank MIA](https://repository-images.githubusercontent.com/1072137871/2b121be2-e5b1-40d9-a170-0c42295c615e)
+
 * Victoriabank IPS Business WebApi docs: https://test-ipspj.victoriabank.md
 * Victoriabank IPS DemoPay WebApi https://test-ipspj-demopay.victoriabank.md/swagger/
 * GitHub project https://github.com/alexminza/victoriabank-mia-sdk-php
