@@ -19,7 +19,7 @@ class VictoriabankMiaClient extends GuzzleClient
 {
     const DEFAULT_BASE_URL = 'https://ips-api-pj.vb.md/';
     const TEST_BASE_URL = 'https://test-ipspj.victoriabank.md/';
-    const TEST_DEMOPAY_URL = 'https://test-ipspj-demopay.victoriabank.md/api/pay/';
+    const TEST_DEMOPAY_URL = 'https://test-ipspj-demopay.victoriabank.md/';
 
     /**
      * @param ClientInterface      $client
@@ -38,6 +38,7 @@ class VictoriabankMiaClient extends GuzzleClient
 
     /**
      * @link https://test-ipspj.victoriabank.md/index.html#operations-Health-get_api_v1_health_status
+     * @return \GuzzleHttp\Command\Result
      */
     public function getHealthStatus()
     {
@@ -51,6 +52,7 @@ class VictoriabankMiaClient extends GuzzleClient
      * @param string $username
      * @param string $password
      * @param string $refresh_token
+     * @return \GuzzleHttp\Command\Result
      */
     public function getToken($grant_type, $username, $password, $refresh_token = null)
     {
@@ -71,6 +73,7 @@ class VictoriabankMiaClient extends GuzzleClient
      * @param string $authToken
      * @param int    $width
      * @param int    $height
+     * @return \GuzzleHttp\Command\Result
      */
     public function createPayeeQr($qrData, $authToken, $width = null, $height = null)
     {
@@ -89,6 +92,7 @@ class VictoriabankMiaClient extends GuzzleClient
      * @param string $qrHeaderUUID
      * @param array  $extensionData
      * @param string $authToken
+     * @return \GuzzleHttp\Command\Result
      */
     public function createPayeeQrExtension($qrHeaderUUID, $extensionData, $authToken)
     {
@@ -105,6 +109,7 @@ class VictoriabankMiaClient extends GuzzleClient
      * @link https://test-ipspj.victoriabank.md/index.html#operations-Qr-delete_api_v1_qr__qrHeaderUUID_
      * @param string $qrHeaderUUID
      * @param string $authToken
+     * @return \GuzzleHttp\Command\Result
      */
     public function cancelPayeeQr($qrHeaderUUID, $authToken)
     {
@@ -121,6 +126,7 @@ class VictoriabankMiaClient extends GuzzleClient
      * @link https://test-ipspj.victoriabank.md/index.html#operations-Qr-delete_api_v1_qr__qrHeaderUUID__active_extension
      * @param string $qrHeaderUUID
      * @param string $authToken
+     * @return \GuzzleHttp\Command\Result
      */
     public function cancelHybrExtension($qrHeaderUUID, $authToken)
     {
@@ -139,6 +145,7 @@ class VictoriabankMiaClient extends GuzzleClient
      * @param string $authToken
      * @param int    $nbOfExt
      * @param int    $nbOfTxs
+     * @return \GuzzleHttp\Command\Result
      */
     public function getPayeeQrStatus($qrHeaderUUID, $authToken, $nbOfExt = null, $nbOfTxs = null)
     {
@@ -158,6 +165,7 @@ class VictoriabankMiaClient extends GuzzleClient
      * @param string $qrExtensionUUID
      * @param string $authToken
      * @param int    $nbOfTxs
+     * @return \GuzzleHttp\Command\Result
      */
     public function getQrExtensionStatus($qrExtensionUUID, $authToken, $nbOfTxs = null)
     {
@@ -177,6 +185,7 @@ class VictoriabankMiaClient extends GuzzleClient
      * @param string $dateFrom
      * @param string $dateTo
      * @param string $messageId
+     * @return \GuzzleHttp\Command\Result
      */
     public function getReconciliationTransactions($authToken, $dateFrom = null, $dateTo = null, $messageId = null)
     {
@@ -195,6 +204,7 @@ class VictoriabankMiaClient extends GuzzleClient
      * @link https://test-ipspj.victoriabank.md/index.html#operations-Signal-get_api_v1_signal__qrExtensionUUID_
      * @param string $qrExtensionUUID
      * @param string $authToken
+     * @return \GuzzleHttp\Command\Result
      */
     public function getSignal($qrExtensionUUID, $authToken)
     {
@@ -211,6 +221,7 @@ class VictoriabankMiaClient extends GuzzleClient
      * @link https://test-ipspj.victoriabank.md/index.html#operations-Transaction-delete_api_v1_transaction__id_
      * @param string $id
      * @param string $authToken
+     * @return \GuzzleHttp\Command\Result
      */
     public function reverseTransaction($id, $authToken)
     {
@@ -220,6 +231,26 @@ class VictoriabankMiaClient extends GuzzleClient
 
         self::setBearerAuthToken($args, $authToken);
         return parent::reverseTransaction($args);
+    }
+
+    /**
+     * Demo Pay (Test)
+     * @link https://test-ipspj-demopay.victoriabank.md/swagger/index.html#operations-Pay-post_api_Pay
+     * @param string $qrHeaderUUID
+     * @param string $authToken
+     * @return \GuzzleHttp\Command\Result
+     */
+    public function demoPay($qrHeaderUUID, $authToken)
+    {
+        $args = [
+            'qrHeaderUUID' => $qrHeaderUUID,
+            '@http' => [
+                'base_uri' => self::TEST_DEMOPAY_URL
+            ]
+        ];
+
+        self::setBearerAuthToken($args, $authToken);
+        return parent::demoPay($args);
     }
 
     /**

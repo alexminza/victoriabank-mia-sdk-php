@@ -1,7 +1,11 @@
 # PHP SDK for Victoriabank MIA API
+
+![Victoriabank MIA](https://repository-images.githubusercontent.com/1072137871/2b121be2-e5b1-40d9-a170-0c42295c615e)
+
 * Victoriabank IPS Business WebApi docs: https://test-ipspj.victoriabank.md
 * Victoriabank IPS DemoPay WebApi https://test-ipspj-demopay.victoriabank.md/swagger/
 * GitHub project https://github.com/alexminza/victoriabank-mia-sdk-php
+* Composer package https://packagist.org/packages/alexminza/victoriabank-mia-sdk
 
 ## Installation
 To easily install or upgrade to the latest release, use `composer`:
@@ -21,25 +25,25 @@ use Victoriabank\VictoriabankMia\VictoriabankMiaClient;
 Add project configuration:
 
 ```php
-const DEBUG = getenv('DEBUG');
+$DEBUG = getenv('DEBUG');
 
-const VB_MIA_BASE_URI = getenv('VB_MIA_BASE_URI');
-const VB_MIA_USERNAME = getenv('VB_MIA_USERNAME');
-const VB_MIA_PASSWORD = getenv('VB_MIA_PASSWORD');
-const VB_CERTIFICATE  = getenv('VB_CERTIFICATE');
-const VB_COMPANY_NAME = getenv('VB_COMPANY_NAME');
-const VB_COMPANY_IBAN = getenv('VB_COMPANY_IBAN');
+$VB_MIA_BASE_URI = getenv('VB_MIA_BASE_URI');
+$VB_MIA_USERNAME = getenv('VB_MIA_USERNAME');
+$VB_MIA_PASSWORD = getenv('VB_MIA_PASSWORD');
+$VB_CERTIFICATE  = getenv('VB_CERTIFICATE');
+$VB_COMPANY_NAME = getenv('VB_COMPANY_NAME');
+$VB_COMPANY_IBAN = getenv('VB_COMPANY_IBAN');
 ```
 
 Initialize client:
 
 ```php
 $options = [
-    'base_uri' => VB_MIA_BASE_URI,
+    'base_uri' => $VB_MIA_BASE_URI,
     'timeout' => 15
 ];
 
-if (DEBUG) {
+if ($DEBUG) {
     $logName = 'victoriabank_mia_guzzle';
     $logFileName = "$logName.log";
 
@@ -60,7 +64,7 @@ $vbMiaClient = new VictoriabankMiaClient($guzzleClient);
 ### Get Access Token with username and password
 
 ```php
-$tokenResponse = $vbMiaClient->getToken('password', VB_MIA_USERNAME, VB_MIA_PASSWORD);
+$tokenResponse = $vbMiaClient->getToken('password', $VB_MIA_USERNAME, $VB_MIA_PASSWORD);
 $accessToken = $tokenResponse['accessToken'];
 ```
 
@@ -75,13 +79,13 @@ $qrData = array(
     ),
     'extension' => array(
         'creditorAccount' => array(
-            'iban' => VB_COMPANY_IBAN
+            'iban' => $VB_COMPANY_IBAN
         ),
         'amount' => array(
             'sum' => 123.45,
             'currency' => 'MDL'
         ),
-        'dba' => VB_COMPANY_NAME,
+        'dba' => $VB_COMPANY_NAME,
         'remittanceInfo4Payer' => 'Order #123',
         'creditorRef' => '123',
         'ttl' => array(
@@ -98,11 +102,26 @@ print_r($createQrResponse);
 ### Decode callback and validate signature
 
 ```php
-$vbCertificate = file_get_contents(VB_CERTIFICATE);
+$vbCertificate = file_get_contents($VB_CERTIFICATE);
 $callbackBody = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaWduYWxDb2RlIjoiRXhwaXJhdGlvbiIsInNpZ25hbER0VG0iOiIyMDI0LTEwLTAxVDE1OjA3OjQ1KzAzOjAwIiwicXJIZWFkZXJVVUlEIjoiYmQxMjA0OWItNjUxZC00MGEwLWIyYmMtZDZhMGY3ZTJiN2M3IiwicXJFeHRlbnNpb25VVUlEIjoiNjU0YWNkNjktNjAyYy00MzUxLTk1OTItODE0M2FlMjhkM2U0IiwicGF5bWVudCI6bnVsbH0.WJ5t8jtg2_6DPrxQNIcu50gsW7cDC8IMdjvOBO9wW3toIdeAljlMPxd_lLCWJiKXToRAVHU7a1EB4mLyzyw1iCcRadnsSqm21TrpDZWTjv3uL-XiMLrWOsGBf0aJJRFcGbysU_ym9YLonQMmYLF0voq39yAPMHO7CLCniSMhVdJ9Q5xnrq52y6Yn5YzefCNb2tAQ-erm-8_mCaF0DWd0UFhPA6TRXyV2l5GCkLbyhlUB9gVoVTdSN-XxA_1aoNTusheZPDH1InL03Bx3G8muaVxOMrMIsVCJJYAaTFKiQTBf0M49oTQpdPWeeS9wHaS7aSS3gUcFsOOEPavj7J8vxg';
 
 $callbackData = VictoriabankMiaClient::decodeValidateCallback($callbackBody, $vbCertificate);
 print_r($callbackData);
+```
+
+### Perform a test QR payment
+
+```php
+$qrHeaderUUID = $createQrResponse['qrHeaderUUID'];
+$demoPayResponse = $client->demoPay($qrHeaderUUID, $accessToken);
+print_r($demoPayResponse);
+```
+
+### Get QR status
+
+```php
+$getPayeeQrStatusResponse = $client->getPayeeQrStatus($qrHeaderUUID, $accessToken);
+print_r($getPayeeQrStatusResponse);
 ```
 
 ### Refund payment
