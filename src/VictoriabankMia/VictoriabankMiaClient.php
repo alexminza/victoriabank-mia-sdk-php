@@ -271,7 +271,7 @@ class VictoriabankMiaClient extends GuzzleClient
     {
         $algorithm = 'RS256';
         $publicKey = openssl_pkey_get_public($certificate);
-        $decoded_payload = JWT::decode($callbackJwt, new Key($publicKey, $algorithm));
+        $decoded_payload = (array) JWT::decode($callbackJwt, new Key($publicKey, $algorithm));
 
         return $decoded_payload;
     }
