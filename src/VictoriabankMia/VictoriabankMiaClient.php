@@ -170,7 +170,7 @@ class VictoriabankMiaClient extends GuzzleClient
     public function getQrExtensionStatus($qrExtensionUUID, $authToken, $nbOfTxs = null)
     {
         $args = [
-            'qrHeaderUUID' => $qrExtensionUUID,
+            'qrExtensionUUID' => $qrExtensionUUID,
             'nbOfTxs' => $nbOfTxs,
         ];
 
