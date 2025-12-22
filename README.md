@@ -76,29 +76,29 @@ $accessToken = $tokenResponse['accessToken'];
 ### Create a dynamic order payment QR
 
 ```php
-$qrData = array(
-    'header' => array(
+$qrData = [
+    'header' => [
         'qrType' => 'DYNM', # Type of QR code: DYNM - Dynamic QR, STAT - Static QR, HYBR - Hybrid QR
         'amountType' => 'Fixed', # Specifies the type of amount: Fixed - Dynamic QR, Controlled - Static QR, Free - Hybrid QR
         'pmtContext' => 'e' #Payment context: m - mobile payment, e - e-commerce payment, i - invoice payment, 0 - other
-    ),
-    'extension' => array(
-        'creditorAccount' => array(
+    ],
+    'extension' => [
+        'creditorAccount' => [
             'iban' => $VB_COMPANY_IBAN
-        ),
-        'amount' => array(
+        ],
+        'amount' => [
             'sum' => 123.45,
             'currency' => 'MDL'
-        ),
+        ],
         'dba' => $VB_COMPANY_NAME,
         'remittanceInfo4Payer' => 'Order #123',
         'creditorRef' => '123',
-        'ttl' => array(
+        'ttl' => [
             'length' => 60, #The duration for which the QR code is valid.
             'units' => 'mm' #The unit of time for the TTL: ss - seconds, mm - minutes
-        )
-    )
-);
+        ]
+    ]
+];
 
 $createQrResponse = $vbMiaClient->createPayeeQr($qrData, $accessToken);
 print_r($createQrResponse);
