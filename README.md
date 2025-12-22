@@ -13,6 +13,11 @@ To easily install or upgrade to the latest release, use `composer`:
 composer require alexminza/victoriabank-mia-sdk
 ```
 
+To enable logging add the `monolog` package:
+```shell
+composer require monolog/monolog
+```
+
 ## Getting started
 Import SDK:
 
@@ -113,14 +118,14 @@ print_r($callbackData);
 
 ```php
 $qrHeaderUUID = $createQrResponse['qrHeaderUUID'];
-$demoPayResponse = $client->demoPay($qrHeaderUUID, $accessToken);
+$demoPayResponse = $vbMiaClient->demoPay($qrHeaderUUID, $accessToken);
 print_r($demoPayResponse);
 ```
 
 ### Get QR status
 
 ```php
-$getPayeeQrStatusResponse = $client->getPayeeQrStatus($qrHeaderUUID, $accessToken);
+$getPayeeQrStatusResponse = $vbMiaClient->getPayeeQrStatus($qrHeaderUUID, $accessToken);
 print_r($getPayeeQrStatusResponse);
 ```
 
