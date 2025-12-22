@@ -17,9 +17,9 @@ use Firebase\JWT\Key;
  */
 class VictoriabankMiaClient extends GuzzleClient
 {
-    const DEFAULT_BASE_URL = 'https://ips-api-pj.vb.md/';
-    const TEST_BASE_URL = 'https://test-ipspj.victoriabank.md/';
-    const TEST_DEMOPAY_URL = 'https://test-ipspj-demopay.victoriabank.md/';
+    public const DEFAULT_BASE_URL = 'https://ips-api-pj.vb.md/';
+    public const TEST_BASE_URL = 'https://test-ipspj.victoriabank.md/';
+    public const TEST_DEMOPAY_URL = 'https://test-ipspj-demopay.victoriabank.md/';
 
     /**
      * @param ClientInterface      $client
