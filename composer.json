@@ -36,10 +36,5 @@
         "psr-4": {
             "Victoriabank\\": "src/"
         }
-    },
-    "archive": {
-        "exclude": [
-            "/.vscode"
-        ]
     }
 }
