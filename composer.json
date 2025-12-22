@@ -32,6 +32,9 @@
         "guzzlehttp/guzzle-services": "^1.0",
         "firebase/php-jwt": "^6.0"
     },
+    "suggest": {
+        "monolog/monolog": "To enable logging of HTTP requests and responses."
+    },
     "autoload": {
         "psr-4": {
             "Victoriabank\\": "src/"
