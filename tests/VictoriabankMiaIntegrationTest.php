@@ -169,7 +169,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
                 'sum' => 25.00,
                 'currency' => 'MDL'
             ],
-            'dba' => 'Test Hybrid Merchant Updated',
+            'dba' => 'Test Hybrid Merchant',
             'remittanceInfo4Payer' => 'Hybrid Order #H1 Updated',
             'creditorRef' => 'H1-UPD',
             'ttl' => [
@@ -181,9 +181,8 @@ class VictoriabankMiaIntegrationTest extends TestCase
         $response = $this->client->createPayeeQrExtension(self::$hybridQrHeaderUUID, $extensionData, self::$accessToken);
         $this->debugLog('createHybridQrExtension', $response);
 
-        $this->assertArrayHasKey('qrExtensionUUID', $response);
-        // Update the extension UUID to the new one
-        self::$hybridQrExtensionUUID = $response['qrExtensionUUID'];
+        $this->assertArrayHasKey('body', $response);
+        self::$hybridQrExtensionUUID = $response['body'];
     }
 
     /**

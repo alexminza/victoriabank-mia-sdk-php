@@ -183,9 +183,12 @@ class VictoriabankMiaDescription extends Description
                 ],
                 'getRawResponse' => [
                     'type' => 'object',
-                    'additionalProperties' => [
-                        'location' => 'body',
-                        'type' => 'string'
+                    'properties' => [
+                        'body' => [
+                            'type' => 'string',
+                            'location' => 'body',
+                            'filters' => ['strval']
+                        ]
                     ]
                 ],
 
