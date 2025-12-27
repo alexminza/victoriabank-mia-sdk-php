@@ -6,3 +6,12 @@ composer.phar
 # composer.lock
 
 .DS_Store
+
+# dotenv environment variable files
+.env
+.env.*
+!.env.example
+
+# PHPUnit
+/.phpunit.cache
+.phpunit.result.cache
