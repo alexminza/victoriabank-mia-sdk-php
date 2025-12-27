@@ -22,7 +22,7 @@ class VictoriabankMiaDescription extends Description
         ];
 
         $description = [
-            //'baseUrl' => 'https://ips-api-pj.vb.md/',
+            // 'baseUrl' => 'https://ips-api-pj.vb.md/',
             'name' => 'IPS Business WebApi',
             'version' => 'v1.0',
 
@@ -31,6 +31,8 @@ class VictoriabankMiaDescription extends Description
                 'getHealthStatus' => [
                     'httpMethod' => 'GET',
                     'uri' => '/api/v1/health/status',
+                    'summary' => 'Health Status',
+                    'responseModel' => 'getResponse',
                 ],
 
                 // Token Operations
@@ -52,7 +54,7 @@ class VictoriabankMiaDescription extends Description
                     'httpMethod' => 'POST',
                     'uri' => '/api/v1/qr',
                     'summary' => 'CreatePayeeQr - Register new payee-presented QR code',
-                    'responseModel' => 'getResponse', #'CreatePayeeQrResponse',
+                    'responseModel' => 'getResponse', // 'CreatePayeeQrResponse',
                     'parameters' => [
                         'authToken' => $authorizationHeader,
                         'width' => ['type' => 'integer', 'location' => 'query', 'description' => 'QR code image width (Default: 300)'],
@@ -67,7 +69,7 @@ class VictoriabankMiaDescription extends Description
                     'httpMethod' => 'POST',
                     'uri' => '/api/v1/qr/{qrHeaderUUID}/extentions',
                     'summary' => 'CreatePayeeQrExtention - Register new extension for HYBR or STAT payee-presented QR code',
-                    'responseModel' => 'getResponse',
+                    'responseModel' => 'getRawResponse', // NOTE: Victoriabank MIA API returns a raw GUID string
                     'parameters' => [
                         'authToken' => $authorizationHeader,
                         'qrHeaderUUID' => ['type' => 'string', 'location' => 'uri', 'required' => true],
@@ -99,7 +101,7 @@ class VictoriabankMiaDescription extends Description
                     'httpMethod' => 'GET',
                     'uri' => '/api/v1/qr/{qrHeaderUUID}/status',
                     'summary' => 'Get status of payee-presented QR code header',
-                    'responseModel' => 'getResponse', #'PayeeQrStatusDto',
+                    'responseModel' => 'getResponse', // 'PayeeQrStatusDto',
                     'parameters' => [
                         'authToken' => $authorizationHeader,
                         'qrHeaderUUID' => ['type' => 'string', 'location' => 'uri', 'required' => true],
@@ -111,7 +113,7 @@ class VictoriabankMiaDescription extends Description
                     'httpMethod' => 'GET',
                     'uri' => '/api/v1/qr-extensions/{qrExtensionUUID}/status',
                     'summary' => 'Get status of QR code extension',
-                    'responseModel' => 'getResponse', #'PayeeQrExtensionStatusDto',
+                    'responseModel' => 'getResponse', // 'PayeeQrExtensionStatusDto',
                     'parameters' => [
                         'authToken' => $authorizationHeader,
                         'qrExtensionUUID' => ['type' => 'string', 'location' => 'uri', 'required' => true],
@@ -124,7 +126,7 @@ class VictoriabankMiaDescription extends Description
                     'httpMethod' => 'GET',
                     'uri' => '/api/v1/reconciliation/transactions',
                     'summary' => 'Transaction list for reconciliation',
-                    'responseModel' => 'getResponse', #'TransactionListDto',
+                    'responseModel' => 'getResponse', // 'TransactionListDto',
                     'parameters' => [
                         'authToken' => $authorizationHeader,
                         'dateFrom' => ['type' => 'string', 'format' => 'date-time', 'location' => 'query'],
@@ -137,7 +139,7 @@ class VictoriabankMiaDescription extends Description
                 'getSignal' => [
                     'httpMethod' => 'GET',
                     'uri' => '/api/v1/signal/{qrExtensionUUID}',
-                    'responseModel' => 'getResponse', #'SignalDto',
+                    'responseModel' => 'getResponse', // 'SignalDto',
                     'parameters' => [
                         'authToken' => $authorizationHeader,
                         'qrExtensionUUID' => ['type' => 'string', 'location' => 'uri', 'required' => true],
@@ -177,6 +179,13 @@ class VictoriabankMiaDescription extends Description
                     'type' => 'object',
                     'additionalProperties' => [
                         'location' => 'json'
+                    ]
+                ],
+                'getRawResponse' => [
+                    'type' => 'object',
+                    'additionalProperties' => [
+                        'location' => 'body',
+                        'type' => 'string'
                     ]
                 ],
 

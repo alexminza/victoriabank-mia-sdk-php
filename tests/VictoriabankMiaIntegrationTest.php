@@ -21,7 +21,9 @@ class VictoriabankMiaIntegrationTest extends TestCase
     protected static $accessToken;
     protected static $qrHeaderUUID;
     protected static $qrExtensionUUID;
-    protected static $newQrExtensionUUID;
+    protected static $hybridQrHeaderUUID;
+    protected static $hybridQrExtensionUUID;
+    protected static $paymentId;
 
     /**
      * @var VictoriabankMiaClient
@@ -61,6 +63,16 @@ class VictoriabankMiaIntegrationTest extends TestCase
         $this->assertNotEmpty($response['accessToken']);
 
         self::$accessToken = $response['accessToken'];
+    }
+
+    public function testGetHealthStatus()
+    {
+        $response = $this->client->getHealthStatus();
+        $this->debugLog('getHealthStatus', $response);
+
+        $this->assertNotNull($response);
+        $this->assertArrayHasKey('status', $response);
+        $this->assertEquals($response['status'], 'Healthy');
     }
 
     /**
@@ -105,6 +117,76 @@ class VictoriabankMiaIntegrationTest extends TestCase
     }
 
     /**
+     * @depends testAuthenticate
+     */
+    public function testCreateHybridQr()
+    {
+        $qrData = [
+            'header' => [
+                'qrType' => 'HYBR',
+                'amountType' => 'Fixed',
+                'pmtContext' => 'e'
+            ],
+            'extension' => [
+                'creditorAccount' => [
+                    'iban' => self::$iban
+                ],
+                'amount' => [
+                    'sum' => 15.00,
+                    'currency' => 'MDL'
+                ],
+                'dba' => 'Test Hybrid Merchant',
+                'remittanceInfo4Payer' => 'Hybrid Order #H1',
+                'creditorRef' => 'H1',
+                'ttl' => [
+                    'length' => 60,
+                    'units' => 'mm'
+                ]
+            ]
+        ];
+
+        $response = $this->client->createPayeeQr($qrData, self::$accessToken);
+        $this->debugLog('createHybridQr', $response);
+
+        $this->assertArrayHasKey('qrHeaderUUID', $response);
+        $this->assertArrayHasKey('qrExtensionUUID', $response);
+        $this->assertArrayHasKey('qrAsText', $response);
+
+        self::$hybridQrHeaderUUID = $response['qrHeaderUUID'];
+        self::$hybridQrExtensionUUID = $response['qrExtensionUUID'];
+    }
+
+    /**
+     * @depends testCreateHybridQr
+     */
+    public function testCreateHybridQrExtension()
+    {
+        $extensionData = [
+            'creditorAccount' => [
+                'iban' => self::$iban
+            ],
+            'amount' => [
+                'sum' => 25.00,
+                'currency' => 'MDL'
+            ],
+            'dba' => 'Test Hybrid Merchant Updated',
+            'remittanceInfo4Payer' => 'Hybrid Order #H1 Updated',
+            'creditorRef' => 'H1-UPD',
+            'ttl' => [
+                'length' => 10,
+                'units' => 'mm'
+            ]
+        ];
+
+        $response = $this->client->createPayeeQrExtension(self::$hybridQrHeaderUUID, $extensionData, self::$accessToken);
+        $this->debugLog('createHybridQrExtension', $response);
+
+        $this->assertArrayHasKey('qrExtensionUUID', $response);
+        // Update the extension UUID to the new one
+        self::$hybridQrExtensionUUID = $response['qrExtensionUUID'];
+    }
+
+    /**
      * @depends testCreatePayeeQr
      */
     public function testGetPayeeQrStatus()
@@ -118,50 +200,16 @@ class VictoriabankMiaIntegrationTest extends TestCase
     }
 
     /**
-     * @depends testCreatePayeeQr
-     */
-    public function testCreatePayeeQrExtension()
-    {
-        $this->markTestSkipped();
-
-        $extensionData = [
-            'creditorAccount' => [
-                'iban' => self::$iban
-            ],
-            'amount' => [
-                'sum' => 20.00,
-                'currency' => 'MDL'
-            ],
-            'dba' => 'Test Merchant Updated',
-            'remittanceInfo4Payer' => 'Updated Payment for Order #123',
-            'creditorRef' => 'ORD-123-UPD',
-            'ttl' => [
-                'length' => 3600,
-                'units' => 'ss'
-            ]
-        ];
-
-        $response = $this->client->createPayeeQrExtension(self::$qrHeaderUUID, $extensionData, self::$accessToken);
-        $this->debugLog('createPayeeQrExtension', $response);
-
-        $this->assertArrayHasKey('qrExtensionUUID', $response);
-        $this->assertNotEmpty($response['qrExtensionUUID']);
-
-        self::$newQrExtensionUUID = $response['qrExtensionUUID'];
-    }
-
-    /**
      * @depends testCreatePayeeQrExtension
      */
     public function testGetQrExtensionStatus()
     {
-        $this->markTestSkipped();
-
-        $response = $this->client->getQrExtensionStatus(self::$newQrExtensionUUID, self::$accessToken);
+        $response = $this->client->getQrExtensionStatus(self::$qrExtensionUUID, self::$accessToken);
         $this->debugLog('getQrExtensionStatus', $response);
 
         $this->assertArrayHasKey('uuid', $response);
-        $this->assertEquals(self::$newQrExtensionUUID, $response['uuid']);
+        $this->assertArrayHasKey('status', $response);
+        $this->assertEquals(self::$qrExtensionUUID, $response['uuid']);
     }
 
     /**
@@ -169,33 +217,80 @@ class VictoriabankMiaIntegrationTest extends TestCase
      */
     public function testDemoPay()
     {
-        // Demo pay requires qrHeaderUUID
-        try {
-            $response = $this->client->demoPay(self::$qrHeaderUUID, self::$accessToken);
-            $this->debugLog('demoPay', $response);
+        $response = $this->client->demoPay(self::$qrHeaderUUID, self::$accessToken);
+        $this->debugLog('demoPay', $response);
 
-            // The response structure for demoPay isn't fully clear from the description
-            // but usually Guzzle command results act like arrays
-            $this->assertNotNull($response);
-        } catch (\Exception $e) {
-            // Demo pay might fail if the QR is not in a payable state or other reasons in test env
-            // We'll log it but not fail strictly if it's a known limitation
-            $this->debugLog('demoPay failed', $e->getMessage());
-            // For now, let's fail if it throws, to catch issues.
-            throw $e;
-        }
+        $this->assertNotNull($response);
+    }
+
+    /**
+     * @depends testCreateHybridQr
+     */
+    public function testCancelPayeeQr()
+    {
+        $response = $this->client->cancelPayeeQr(self::$hybridQrHeaderUUID, self::$accessToken);
+        $this->debugLog('cancelPayeeQr', $response);
+
+        $this->assertNotNull($response);
     }
 
     /**
      * @depends testCreatePayeeQr
      */
-    public function testCancelPayeeQr()
+    public function testGetSignal()
     {
-        $response = $this->client->cancelPayeeQr(self::$qrHeaderUUID, self::$accessToken);
-        $this->debugLog('cancelPayeeQr', $response);
-
-        // Delete operations might return empty body or 204 No Content
-        // Guzzle Command Result might be empty or contain status code
+        $response = $this->client->getSignal(self::$qrHeaderUUID, self::$accessToken);
+        $this->debugLog('getSignal', $response);
         $this->assertNotNull($response);
+    }
+
+    /**
+     * @depends testCreateHybridQrExtension
+     */
+    public function testCancelHybridExtension()
+    {
+        $response = $this->client->cancelHybrExtension(self::$hybridQrHeaderUUID, self::$accessToken);
+        $this->debugLog('cancelHybridExtension', $response);
+
+        $this->assertNotNull($response);
+    }
+
+    /**
+     * @depends testAuthenticate
+     */
+    public function testReconciliationTransactions()
+    {
+        $dateFrom = (new \DateTime('-1 day'))->format('Y-m-d\TH:i:s\Z');
+        $dateTo = (new \DateTime('+1 day'))->format('Y-m-d\TH:i:s\Z');
+
+        $response = $this->client->getReconciliationTransactions(self::$accessToken, $dateFrom, $dateTo);
+        $this->debugLog('getReconciliationTransactions', $response);
+
+        $this->assertNotNull($response);
+    }
+
+    public function testValidateCallback()
+    {
+        // Generate a temporary key pair for testing the JWT decoding
+        $res = openssl_pkey_new([
+            "digest_alg" => "sha256",
+            "private_key_bits" => 2048,
+            "private_key_type" => OPENSSL_KEYTYPE_RSA,
+        ]);
+        openssl_pkey_export($res, $privateKey);
+        $publicKey = openssl_pkey_get_details($res)['key'];
+
+        // Create a JWT
+        $payload = [
+            'iss' => 'Victoriabank',
+            'iat' => time(),
+            'data' => 'test'
+        ];
+        $jwt = \Firebase\JWT\JWT::encode($payload, $privateKey, 'RS256');
+
+        // Test decoding using the public key we just generated
+        $decoded = VictoriabankMiaClient::decodeValidateCallback($jwt, $publicKey);
+
+        $this->assertEquals('Victoriabank', $decoded->iss);
     }
 }
