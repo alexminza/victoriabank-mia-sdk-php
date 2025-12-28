@@ -16,7 +16,7 @@ class VictoriabankMiaDescription extends Description
     {
         $package = 'alexminza/victoriabank-mia-sdk';
         $version = InstalledVersions::getPrettyVersion($package) ?? 'dev';
-        $userAgent = "$package-php/$version";
+        $userAgent = "victoriabank-mia-sdk-php/$version";
 
         $authorizationHeader = [
             'type' => 'string',
