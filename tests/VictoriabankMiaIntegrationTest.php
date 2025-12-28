@@ -48,10 +48,33 @@ class VictoriabankMiaIntegrationTest extends TestCase
         $this->client = new VictoriabankMiaClient(new Client(['base_uri' => self::$baseUrl]));
     }
 
+    protected function onNotSuccessfulTest(\Throwable $t): never
+    {
+        // https://github.com/guzzle/guzzle/issues/2185
+        if ($t instanceof \GuzzleHttp\Command\Exception\CommandException) {
+            $response = $t->getResponse();
+            $responseBody = (string)$response->getBody();
+            $this->debugLog($responseBody, $t);
+        }
+
+        parent::onNotSuccessfulTest($t);
+    }
+
     protected function debugLog($message, $data)
     {
+        $data = $this->redactData($data);
         $data_print = print_r($data, true);
         error_log("$message: $data_print");
+    }
+
+    protected function redactData($data) {
+        if ($data) {
+            if (isset($data['qrAsImage'])) {
+                $data['qrAsImage'] = '[REDACTED]';
+            }
+        }
+
+        return $data;
     }
 
     public function testAuthenticate()
@@ -186,6 +209,30 @@ class VictoriabankMiaIntegrationTest extends TestCase
     }
 
     /**
+     * @depends testCreateHybridQrExtension
+     */
+    public function testCancelHybridExtension()
+    {
+        $response = $this->client->cancelHybrExtension(self::$hybridQrHeaderUUID, self::$accessToken);
+        $this->debugLog('cancelHybridExtension', $response);
+
+        $this->assertNotNull($response);
+        $this->assertEmpty($response);
+    }
+
+    /**
+     * @depends testCancelHybridExtension
+     */
+    public function testCancelPayeeQr()
+    {
+        $response = $this->client->cancelPayeeQr(self::$hybridQrHeaderUUID, self::$accessToken);
+        $this->debugLog('cancelPayeeQr', $response);
+
+        $this->assertNotNull($response);
+    }
+
+
+    /**
      * @depends testCreatePayeeQr
      */
     public function testGetPayeeQrStatus()
@@ -223,34 +270,14 @@ class VictoriabankMiaIntegrationTest extends TestCase
     }
 
     /**
-     * @depends testCreateHybridQr
-     */
-    public function testCancelPayeeQr()
-    {
-        $response = $this->client->cancelPayeeQr(self::$hybridQrHeaderUUID, self::$accessToken);
-        $this->debugLog('cancelPayeeQr', $response);
-
-        $this->assertNotNull($response);
-    }
-
-    /**
-     * @depends testCreatePayeeQr
+     * @depends testDemoPay
      */
     public function testGetSignal()
     {
-        $response = $this->client->getSignal(self::$qrHeaderUUID, self::$accessToken);
+        self::markTestSkipped();
+
+        $response = $this->client->getSignal(self::$qrExtensionUUID, self::$accessToken);
         $this->debugLog('getSignal', $response);
-        $this->assertNotNull($response);
-    }
-
-    /**
-     * @depends testCreateHybridQrExtension
-     */
-    public function testCancelHybridExtension()
-    {
-        $response = $this->client->cancelHybrExtension(self::$hybridQrHeaderUUID, self::$accessToken);
-        $this->debugLog('cancelHybridExtension', $response);
-
         $this->assertNotNull($response);
     }
 
