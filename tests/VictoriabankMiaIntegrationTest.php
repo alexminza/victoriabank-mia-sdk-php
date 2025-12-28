@@ -45,7 +45,26 @@ class VictoriabankMiaIntegrationTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->client = new VictoriabankMiaClient(new Client(['base_uri' => self::$baseUrl]));
+        $options = [
+            'base_uri' => self::$baseUrl,
+            'timeout' => 15
+        ];
+
+        #region Logging
+        $classParts = explode('\\', self::class);
+        $logName = end($classParts) . '_guzzle';
+        $logFileName = "$logName.log";
+
+        $log = new \Monolog\Logger($logName);
+        $log->pushHandler(new \Monolog\Handler\StreamHandler($logFileName, \Monolog\Level::Debug));
+
+        $stack = \GuzzleHttp\HandlerStack::create();
+        $stack->push(\GuzzleHttp\Middleware::log($log, new \GuzzleHttp\MessageFormatter(\GuzzleHttp\MessageFormatter::DEBUG)));
+
+        $options['handler'] = $stack;
+        #endregion
+
+        $this->client = new VictoriabankMiaClient(new Client($options));
     }
 
     protected function onNotSuccessfulTest(\Throwable $t): never
@@ -53,8 +72,8 @@ class VictoriabankMiaIntegrationTest extends TestCase
         // https://github.com/guzzle/guzzle/issues/2185
         if ($t instanceof \GuzzleHttp\Command\Exception\CommandException) {
             $response = $t->getResponse();
-            $responseBody = (string)$response->getBody();
-            $this->debugLog($responseBody, $t);
+            $responseBody = (string) $response->getBody();
+            // $this->debugLog($responseBody, $t->getMessage());
         }
 
         parent::onNotSuccessfulTest($t);
@@ -80,7 +99,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
     public function testAuthenticate()
     {
         $response = $this->client->getToken('password', self::$username, self::$password);
-        $this->debugLog('getToken', $response);
+        // $this->debugLog('getToken', $response);
 
         $this->assertArrayHasKey('accessToken', $response);
         $this->assertNotEmpty($response['accessToken']);
@@ -91,7 +110,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
     public function testGetHealthStatus()
     {
         $response = $this->client->getHealthStatus();
-        $this->debugLog('getHealthStatus', $response);
+        // $this->debugLog('getHealthStatus', $response);
 
         $this->assertNotEmpty($response);
         $this->assertArrayHasKey('status', $response);
@@ -128,7 +147,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
         ];
 
         $response = $this->client->createPayeeQr($qrData, self::$accessToken);
-        $this->debugLog('createPayeeQr', $response);
+        // $this->debugLog('createPayeeQr', $response);
 
         $this->assertArrayHasKey('qrHeaderUUID', $response);
         $this->assertArrayHasKey('qrExtensionUUID', $response);
@@ -169,7 +188,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
         ];
 
         $response = $this->client->createPayeeQr($qrData, self::$accessToken);
-        $this->debugLog('createHybridQr', $response);
+        // $this->debugLog('createHybridQr', $response);
 
         $this->assertArrayHasKey('qrHeaderUUID', $response);
         $this->assertArrayHasKey('qrExtensionUUID', $response);
@@ -202,7 +221,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
         ];
 
         $response = $this->client->createPayeeQrExtension(self::$hybridQrHeaderUUID, $extensionData, self::$accessToken);
-        $this->debugLog('createHybridQrExtension', $response);
+        // $this->debugLog('createHybridQrExtension', $response);
 
         $this->assertArrayHasKey('body', $response);
         self::$hybridQrExtensionUUID = $response['body'];
@@ -214,7 +233,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
     public function testCancelHybridExtension()
     {
         $response = $this->client->cancelHybrExtension(self::$hybridQrHeaderUUID, self::$accessToken);
-        $this->debugLog('cancelHybridExtension', $response);
+        // $this->debugLog('cancelHybridExtension', $response);
 
         $this->assertNotNull($response);
         $this->assertEmpty($response);
@@ -226,7 +245,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
     public function testCancelPayeeQr()
     {
         $response = $this->client->cancelPayeeQr(self::$hybridQrHeaderUUID, self::$accessToken);
-        $this->debugLog('cancelPayeeQr', $response);
+        // $this->debugLog('cancelPayeeQr', $response);
 
         $this->assertNotNull($response);
         $this->assertEmpty($response);
@@ -238,7 +257,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
     public function testGetPayeeQrStatus()
     {
         $response = $this->client->getPayeeQrStatus(self::$qrHeaderUUID, self::$accessToken);
-        $this->debugLog('getPayeeQrStatus', $response);
+        // $this->debugLog('getPayeeQrStatus', $response);
 
         $this->assertArrayHasKey('uuid', $response);
         $this->assertArrayHasKey('status', $response);
@@ -251,7 +270,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
     public function testGetQrExtensionStatus()
     {
         $response = $this->client->getQrExtensionStatus(self::$qrExtensionUUID, self::$accessToken);
-        $this->debugLog('getQrExtensionStatus', $response);
+        // $this->debugLog('getQrExtensionStatus', $response);
 
         $this->assertArrayHasKey('uuid', $response);
         $this->assertArrayHasKey('status', $response);
@@ -264,7 +283,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
     public function testDemoPay()
     {
         $response = $this->client->demoPay(self::$qrHeaderUUID, self::$accessToken);
-        $this->debugLog('demoPay', $response);
+        // $this->debugLog('demoPay', $response);
 
         $this->assertNotNull($response);
         $this->assertEmpty($response);
@@ -281,7 +300,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
         for ($i = 0; $i < $maxRetries; $i++) {
             sleep(5);
             $response = $this->client->getPayeeQrStatus(self::$qrHeaderUUID, self::$accessToken, 1, 1);
-            $this->debugLog('testReverseDemoPayTransaction', $response);
+            // $this->debugLog('testReverseDemoPayTransaction', $response);
 
             $this->assertNotEmpty($response);
             $this->assertArrayHasKey('status', $response);
@@ -300,7 +319,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
         $this->assertNotEmpty($transactionId);
 
         $response = $this->client->reverseTransaction($transactionId, self::$accessToken);
-        $this->debugLog('reverseDemoPayTransaction', $response);
+        // $this->debugLog('reverseDemoPayTransaction', $response);
 
         $this->assertNotNull($response);
         $this->assertEmpty($response);
@@ -312,7 +331,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
     public function testGetSignal()
     {
         $response = $this->client->getSignal(self::$qrExtensionUUID, self::$accessToken);
-        $this->debugLog('getSignal', $response);
+        // $this->debugLog('getSignal', $response);
 
         $this->assertNotEmpty($response);
     }
