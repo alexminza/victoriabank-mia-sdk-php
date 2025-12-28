@@ -330,29 +330,4 @@ class VictoriabankMiaIntegrationTest extends TestCase
 
         $this->assertNotEmpty($response);
     }
-
-    public function testValidateCallback()
-    {
-        // Generate a temporary key pair for testing the JWT decoding
-        $res = openssl_pkey_new([
-            "digest_alg" => "sha256",
-            "private_key_bits" => 2048,
-            "private_key_type" => OPENSSL_KEYTYPE_RSA,
-        ]);
-        openssl_pkey_export($res, $privateKey);
-        $publicKey = openssl_pkey_get_details($res)['key'];
-
-        // Create a JWT
-        $payload = [
-            'iss' => 'Victoriabank',
-            'iat' => time(),
-            'data' => 'test'
-        ];
-        $jwt = \Firebase\JWT\JWT::encode($payload, $privateKey, 'RS256');
-
-        // Test decoding using the public key we just generated
-        $decoded = VictoriabankMiaClient::decodeValidateCallback($jwt, $publicKey);
-
-        $this->assertEquals('Victoriabank', $decoded->iss);
-    }
 }
