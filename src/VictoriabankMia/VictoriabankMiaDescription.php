@@ -3,6 +3,7 @@
 namespace Victoriabank\VictoriabankMia;
 
 use GuzzleHttp\Command\Guzzle\Description;
+use Composer\InstalledVersions;
 
 /**
  * Victoriabank MIA API service description
@@ -13,6 +14,10 @@ class VictoriabankMiaDescription extends Description
 {
     public function __construct(array $options = [])
     {
+        $package = 'alexminza/victoriabank-mia-sdk';
+        $version = InstalledVersions::getPrettyVersion($package) ?? 'dev';
+        $userAgent = "$package-php/$version";
+
         $authorizationHeader = [
             'type' => 'string',
             'location' => 'header',
@@ -27,8 +32,18 @@ class VictoriabankMiaDescription extends Description
             'version' => 'v1.0',
 
             'operations' => [
+                'baseOp' => [
+                    'parameters' => [
+                        'User-Agent' => [
+                            'location' => 'header',
+                            'default'  => $userAgent,
+                        ],
+                    ],
+                ],
+
                 // Health Operations
                 'getHealthStatus' => [
+                    'extends' => 'baseOp',
                     'httpMethod' => 'GET',
                     'uri' => '/api/v1/health/status',
                     'summary' => 'Health Status',
@@ -37,6 +52,7 @@ class VictoriabankMiaDescription extends Description
 
                 // Token Operations
                 'getToken' => [
+                    'extends' => 'baseOp',
                     'httpMethod' => 'POST',
                     'uri' => '/identity/token',
                     'summary' => 'Get tokens',
@@ -51,6 +67,7 @@ class VictoriabankMiaDescription extends Description
 
                 // QR Operations
                 'createPayeeQr' => [
+                    'extends' => 'baseOp',
                     'httpMethod' => 'POST',
                     'uri' => '/api/v1/qr',
                     'summary' => 'CreatePayeeQr - Register new payee-presented QR code',
@@ -66,6 +83,7 @@ class VictoriabankMiaDescription extends Description
                     ]
                 ],
                 'createPayeeQrExtension' => [
+                    'extends' => 'baseOp',
                     'httpMethod' => 'POST',
                     'uri' => '/api/v1/qr/{qrHeaderUUID}/extentions',
                     'summary' => 'CreatePayeeQrExtention - Register new extension for HYBR or STAT payee-presented QR code',
@@ -80,6 +98,7 @@ class VictoriabankMiaDescription extends Description
                     ]
                 ],
                 'cancelPayeeQr' => [
+                    'extends' => 'baseOp',
                     'httpMethod' => 'DELETE',
                     'uri' => '/api/v1/qr/{qrHeaderUUID}',
                     'summary' => 'CancelPayeeQr-Cancel payee-resented QR code',
@@ -89,6 +108,7 @@ class VictoriabankMiaDescription extends Description
                     ],
                 ],
                 'cancelHybrExtension' => [
+                    'extends' => 'baseOp',
                     'httpMethod' => 'DELETE',
                     'uri' => '/api/v1/qr/{qrHeaderUUID}/active-extension',
                     'summary' => 'Cancel active extension of hybrid payee-presented QR code',
@@ -98,6 +118,7 @@ class VictoriabankMiaDescription extends Description
                     ],
                 ],
                 'getPayeeQrStatus' => [
+                    'extends' => 'baseOp',
                     'httpMethod' => 'GET',
                     'uri' => '/api/v1/qr/{qrHeaderUUID}/status',
                     'summary' => 'Get status of payee-presented QR code header',
@@ -110,6 +131,7 @@ class VictoriabankMiaDescription extends Description
                     ],
                 ],
                 'getQrExtensionStatus' => [
+                    'extends' => 'baseOp',
                     'httpMethod' => 'GET',
                     'uri' => '/api/v1/qr-extensions/{qrExtensionUUID}/status',
                     'summary' => 'Get status of QR code extension',
@@ -123,6 +145,7 @@ class VictoriabankMiaDescription extends Description
 
                 // Reconciliation Operations
                 'getReconciliationTransactions' => [
+                    'extends' => 'baseOp',
                     'httpMethod' => 'GET',
                     'uri' => '/api/v1/reconciliation/transactions',
                     'summary' => 'Transaction list for reconciliation',
@@ -137,6 +160,7 @@ class VictoriabankMiaDescription extends Description
 
                 // Signal Operations
                 'getSignal' => [
+                    'extends' => 'baseOp',
                     'httpMethod' => 'GET',
                     'uri' => '/api/v1/signal/{qrExtensionUUID}',
                     'responseModel' => 'getResponse', // 'SignalDto',
@@ -148,6 +172,7 @@ class VictoriabankMiaDescription extends Description
 
                 // Transaction Operations
                 'reverseTransaction' => [
+                    'extends' => 'baseOp',
                     'httpMethod' => 'DELETE',
                     'uri' => '/api/v1/transaction/{id}',
                     'summary' => 'Reverse already processed transaction',
@@ -159,6 +184,7 @@ class VictoriabankMiaDescription extends Description
 
                 // Demo Payment Operations
                 'demoPay' => [
+                    'extends' => 'baseOp',
                     'httpMethod' => 'POST',
                     'uri' => '/api/pay',
                     'summary' => 'Demo Pay (Test)',
