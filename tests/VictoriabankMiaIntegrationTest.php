@@ -93,7 +93,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
         $response = $this->client->getHealthStatus();
         $this->debugLog('getHealthStatus', $response);
 
-        $this->assertNotNull($response);
+        $this->assertNotEmpty($response);
         $this->assertArrayHasKey('status', $response);
         $this->assertEquals($response['status'], 'Healthy');
     }
@@ -229,8 +229,8 @@ class VictoriabankMiaIntegrationTest extends TestCase
         $this->debugLog('cancelPayeeQr', $response);
 
         $this->assertNotNull($response);
+        $this->assertEmpty($response);
     }
-
 
     /**
      * @depends testCreatePayeeQr
@@ -241,8 +241,8 @@ class VictoriabankMiaIntegrationTest extends TestCase
         $this->debugLog('getPayeeQrStatus', $response);
 
         $this->assertArrayHasKey('uuid', $response);
-        $this->assertEquals(self::$qrHeaderUUID, $response['uuid']);
         $this->assertArrayHasKey('status', $response);
+        $this->assertEquals(self::$qrHeaderUUID, $response['uuid']);
     }
 
     /**
@@ -267,6 +267,43 @@ class VictoriabankMiaIntegrationTest extends TestCase
         $this->debugLog('demoPay', $response);
 
         $this->assertNotNull($response);
+        $this->assertEmpty($response);
+    }
+
+    /**
+     * @depends testDemoPay
+     */
+    public function testReverseDemoPayTransaction()
+    {
+        $maxRetries = 5;
+        $response = null;
+
+        for ($i = 0; $i < $maxRetries; $i++) {
+            sleep(5);
+            $response = $this->client->getPayeeQrStatus(self::$qrHeaderUUID, self::$accessToken, 1, 1);
+            $this->debugLog('testReverseDemoPayTransaction', $response);
+
+            $this->assertNotEmpty($response);
+            $this->assertArrayHasKey('status', $response);
+
+            if (strtolower($response['status']) === 'paid') {
+                break;
+            }
+        }
+
+        $this->assertNotEmpty($response['extensions'], 'QR status should have extensions');
+        $this->assertNotEmpty($response['extensions'][0]['payments'], 'QR extension should have payments after demoPay');
+
+        $payment = $response['extensions'][0]['payments'][0];
+        $transactionId = VictoriabankMiaClient::getPaymentTransactionId($payment['reference']);
+
+        $this->assertNotEmpty($transactionId);
+
+        $response = $this->client->reverseTransaction($transactionId, self::$accessToken);
+        $this->debugLog('reverseDemoPayTransaction', $response);
+
+        $this->assertNotNull($response);
+        $this->assertEmpty($response);
     }
 
     /**
@@ -274,11 +311,10 @@ class VictoriabankMiaIntegrationTest extends TestCase
      */
     public function testGetSignal()
     {
-        self::markTestSkipped();
-
         $response = $this->client->getSignal(self::$qrExtensionUUID, self::$accessToken);
         $this->debugLog('getSignal', $response);
-        $this->assertNotNull($response);
+
+        $this->assertNotEmpty($response);
     }
 
     /**
@@ -286,13 +322,13 @@ class VictoriabankMiaIntegrationTest extends TestCase
      */
     public function testReconciliationTransactions()
     {
-        $dateFrom = (new \DateTime('-1 day'))->format('Y-m-d\TH:i:s\Z');
-        $dateTo = (new \DateTime('+1 day'))->format('Y-m-d\TH:i:s\Z');
+        $dateFrom = (new \DateTime('today'))->format('Y-m-d\TH:i:s\Z'); // '-1 day'
+        $dateTo = (new \DateTime('tomorrow'))->format('Y-m-d\TH:i:s\Z'); // '+1 day'
 
         $response = $this->client->getReconciliationTransactions(self::$accessToken, $dateFrom, $dateTo);
-        $this->debugLog('getReconciliationTransactions', $response);
+        // $this->debugLog('getReconciliationTransactions', $response);
 
-        $this->assertNotNull($response);
+        $this->assertNotEmpty($response);
     }
 
     public function testValidateCallback()
