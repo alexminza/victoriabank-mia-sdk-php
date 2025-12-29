@@ -69,14 +69,22 @@ class VictoriabankMiaIntegrationTest extends TestCase
 
     protected function onNotSuccessfulTest(\Throwable $t): never
     {
-        // https://github.com/guzzle/guzzle/issues/2185
-        if ($t instanceof \GuzzleHttp\Command\Exception\CommandException) {
-            $response = $t->getResponse();
-            $responseBody = (string) $response->getBody();
-            // $this->debugLog($responseBody, $t->getMessage());
+        if ($this->isDebugMode()) {
+            // https://github.com/guzzle/guzzle/issues/2185
+            if ($t instanceof \GuzzleHttp\Command\Exception\CommandException) {
+                $response = $t->getResponse();
+                $responseBody = (string) $response->getBody();
+                $this->debugLog($responseBody, $t->getMessage());
+            }
         }
 
         parent::onNotSuccessfulTest($t);
+    }
+
+    protected function isDebugMode()
+    {
+        // https://stackoverflow.com/questions/12610605/is-there-a-way-to-tell-if-debug-or-verbose-was-passed-to-phpunit-in-a-test
+        return in_array('--debug', $_SERVER['argv'] ?? []);
     }
 
     protected function debugLog($message, $data)
