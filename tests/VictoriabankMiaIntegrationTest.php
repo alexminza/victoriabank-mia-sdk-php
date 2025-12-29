@@ -56,7 +56,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
         $logFileName = "$logName.log";
 
         $log = new \Monolog\Logger($logName);
-        $log->pushHandler(new \Monolog\Handler\StreamHandler($logFileName, \Monolog\Level::Debug));
+        $log->pushHandler(new \Monolog\Handler\StreamHandler($logFileName, \Monolog\Logger::DEBUG));
 
         $stack = \GuzzleHttp\HandlerStack::create();
         $stack->push(\GuzzleHttp\Middleware::log($log, new \GuzzleHttp\MessageFormatter(\GuzzleHttp\MessageFormatter::DEBUG)));
@@ -67,7 +67,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
         $this->client = new VictoriabankMiaClient(new Client($options));
     }
 
-    protected function onNotSuccessfulTest(\Throwable $t): never
+    protected function onNotSuccessfulTest(\Throwable $t): void
     {
         if ($this->isDebugMode()) {
             // https://github.com/guzzle/guzzle/issues/2185
@@ -273,7 +273,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
     }
 
     /**
-     * @depends testCreatePayeeQrExtension
+     * @depends testCreatePayeeQr
      */
     public function testGetQrExtensionStatus()
     {
