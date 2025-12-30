@@ -101,7 +101,6 @@ $qrData = [
 ];
 
 $createQrResponse = $vbMiaClient->createPayeeQr($qrData, $accessToken);
-print_r($createQrResponse);
 ```
 
 ### Decode callback and validate signature
@@ -111,7 +110,6 @@ $vbCertificate = file_get_contents($VB_CERTIFICATE);
 $callbackBody = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaWduYWxDb2RlIjoiRXhwaXJhdGlvbiIsInNpZ25hbER0VG0iOiIyMDI0LTEwLTAxVDE1OjA3OjQ1KzAzOjAwIiwicXJIZWFkZXJVVUlEIjoiYmQxMjA0OWItNjUxZC00MGEwLWIyYmMtZDZhMGY3ZTJiN2M3IiwicXJFeHRlbnNpb25VVUlEIjoiNjU0YWNkNjktNjAyYy00MzUxLTk1OTItODE0M2FlMjhkM2U0IiwicGF5bWVudCI6bnVsbH0.WJ5t8jtg2_6DPrxQNIcu50gsW7cDC8IMdjvOBO9wW3toIdeAljlMPxd_lLCWJiKXToRAVHU7a1EB4mLyzyw1iCcRadnsSqm21TrpDZWTjv3uL-XiMLrWOsGBf0aJJRFcGbysU_ym9YLonQMmYLF0voq39yAPMHO7CLCniSMhVdJ9Q5xnrq52y6Yn5YzefCNb2tAQ-erm-8_mCaF0DWd0UFhPA6TRXyV2l5GCkLbyhlUB9gVoVTdSN-XxA_1aoNTusheZPDH1InL03Bx3G8muaVxOMrMIsVCJJYAaTFKiQTBf0M49oTQpdPWeeS9wHaS7aSS3gUcFsOOEPavj7J8vxg';
 
 $callbackData = VictoriabankMiaClient::decodeValidateCallback($callbackBody, $vbCertificate);
-print_r($callbackData);
 ```
 
 ### Perform a test QR payment
@@ -119,14 +117,12 @@ print_r($callbackData);
 ```php
 $qrHeaderUUID = $createQrResponse['qrHeaderUUID'];
 $demoPayResponse = $vbMiaClient->demoPay($qrHeaderUUID, $accessToken);
-print_r($demoPayResponse);
 ```
 
 ### Get QR status
 
 ```php
 $getPayeeQrStatusResponse = $vbMiaClient->getPayeeQrStatus($qrHeaderUUID, $accessToken);
-print_r($getPayeeQrStatusResponse);
 ```
 
 ### Refund payment
