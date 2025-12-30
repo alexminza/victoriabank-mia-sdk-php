@@ -23,7 +23,8 @@ class VictoriabankMiaIntegrationTest extends TestCase
     protected static $qrExtensionUUID;
     protected static $hybridQrHeaderUUID;
     protected static $hybridQrExtensionUUID;
-    protected static $paymentId;
+    protected static $qrData;
+    protected static $hybridQrData;
 
     /**
      * @var VictoriabankMiaClient
@@ -164,14 +165,15 @@ class VictoriabankMiaIntegrationTest extends TestCase
 
         self::$qrHeaderUUID = $response['qrHeaderUUID'];
         self::$qrExtensionUUID = $response['qrExtensionUUID'];
+        self::$qrData = $qrData;
     }
 
     /**
      * @depends testAuthenticate
      */
-    public function testCreateHybridQr()
+    public function testCreatePayeeQrHybrid()
     {
-        $qrData = [
+        $hybridData = [
             'header' => [
                 'qrType' => 'HYBR',
                 'amountType' => 'Fixed',
@@ -195,8 +197,8 @@ class VictoriabankMiaIntegrationTest extends TestCase
             ]
         ];
 
-        $response = $this->client->createPayeeQr($qrData, self::$accessToken);
-        // $this->debugLog('createHybridQr', $response);
+        $response = $this->client->createPayeeQr($hybridData, self::$accessToken);
+        // $this->debugLog('createPayeeQr', $response);
 
         $this->assertArrayHasKey('qrHeaderUUID', $response);
         $this->assertArrayHasKey('qrExtensionUUID', $response);
@@ -204,12 +206,13 @@ class VictoriabankMiaIntegrationTest extends TestCase
 
         self::$hybridQrHeaderUUID = $response['qrHeaderUUID'];
         self::$hybridQrExtensionUUID = $response['qrExtensionUUID'];
+        self::$hybridQrData = $hybridData;
     }
 
     /**
-     * @depends testCreateHybridQr
+     * @depends testCreatePayeeQrHybrid
      */
-    public function testCreateHybridQrExtension()
+    public function testCreatePayeeQrExtension()
     {
         $extensionData = [
             'creditorAccount' => [
@@ -229,26 +232,26 @@ class VictoriabankMiaIntegrationTest extends TestCase
         ];
 
         $response = $this->client->createPayeeQrExtension(self::$hybridQrHeaderUUID, $extensionData, self::$accessToken);
-        // $this->debugLog('createHybridQrExtension', $response);
+        // $this->debugLog('createPayeeQrExtension', $response);
 
         $this->assertArrayHasKey('body', $response);
         self::$hybridQrExtensionUUID = $response['body'];
     }
 
     /**
-     * @depends testCreateHybridQrExtension
+     * @depends testCreatePayeeQrExtension
      */
-    public function testCancelHybridExtension()
+    public function testCancelHybrExtension()
     {
         $response = $this->client->cancelHybrExtension(self::$hybridQrHeaderUUID, self::$accessToken);
-        // $this->debugLog('cancelHybridExtension', $response);
+        // $this->debugLog('cancelHybrExtension', $response);
 
         $this->assertNotNull($response);
         $this->assertEmpty($response);
     }
 
     /**
-     * @depends testCancelHybridExtension
+     * @depends testCancelHybrExtension
      */
     public function testCancelPayeeQr()
     {
@@ -300,7 +303,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
     /**
      * @depends testDemoPay
      */
-    public function testReverseDemoPayTransaction()
+    public function testReverseTransaction()
     {
         $maxRetries = 5;
         $response = null;
@@ -308,7 +311,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
         for ($i = 0; $i < $maxRetries; $i++) {
             sleep(5);
             $response = $this->client->getPayeeQrStatus(self::$qrHeaderUUID, self::$accessToken, 1, 1);
-            // $this->debugLog('testReverseDemoPayTransaction', $response);
+            // $this->debugLog('getPayeeQrStatus', $response);
 
             $this->assertNotEmpty($response);
             $this->assertArrayHasKey('status', $response);
@@ -327,7 +330,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
         $this->assertNotEmpty($transactionId);
 
         $response = $this->client->reverseTransaction($transactionId, self::$accessToken);
-        // $this->debugLog('reverseDemoPayTransaction', $response);
+        // $this->debugLog('testReverseTransaction', $response);
 
         $this->assertNotNull($response);
         $this->assertEmpty($response);
@@ -347,7 +350,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
     /**
      * @depends testAuthenticate
      */
-    public function testReconciliationTransactions()
+    public function testGetReconciliationTransactions()
     {
         $dateFrom = (new \DateTime('today'))->format('Y-m-d\TH:i:s\Z'); // '-1 day'
         $dateTo = (new \DateTime('tomorrow'))->format('Y-m-d\TH:i:s\Z'); // '+1 day'
