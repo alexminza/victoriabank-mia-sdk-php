@@ -75,7 +75,9 @@ class VictoriabankMiaIntegrationTest extends TestCase
             if ($t instanceof \GuzzleHttp\Command\Exception\CommandException) {
                 $response = $t->getResponse();
                 $responseBody = (string) $response->getBody();
-                $this->debugLog($responseBody, $t->getMessage());
+                $exceptionMessage = $t->getMessage();
+
+                $this->debugLog($responseBody, $exceptionMessage);
             }
         }
 

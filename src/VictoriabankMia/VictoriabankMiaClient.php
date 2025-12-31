@@ -31,8 +31,8 @@ class VictoriabankMiaClient extends GuzzleClient
         ?DescriptionInterface $description = null,
         array $config = []
     ) {
-        $client = $client instanceof ClientInterface ? $client : new Client();
-        $description = $description instanceof DescriptionInterface ? $description : new VictoriabankMiaDescription();
+        $client = $client ?? new Client();
+        $description = $description ?? new VictoriabankMiaDescription();
         parent::__construct($client, $description, null, null, null, $config);
     }
 
