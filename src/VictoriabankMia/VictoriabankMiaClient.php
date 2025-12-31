@@ -6,6 +6,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Command\Guzzle\DescriptionInterface;
 use GuzzleHttp\Command\Guzzle\GuzzleClient;
+use GuzzleHttp\Command\Result;
 
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
@@ -21,40 +22,26 @@ class VictoriabankMiaClient extends GuzzleClient
     public const TEST_BASE_URL = 'https://test-ipspj.victoriabank.md/';
     public const TEST_DEMOPAY_URL = 'https://test-ipspj-demopay.victoriabank.md/';
 
-    /**
-     * @param ClientInterface      $client
-     * @param DescriptionInterface $description
-     * @param array                $config
-     */
-    public function __construct(
-        ?ClientInterface $client = null,
-        ?DescriptionInterface $description = null,
-        array $config = []
-    ) {
+    public function __construct(?ClientInterface $client = null, ?DescriptionInterface $description = null, array $config = [])
+    {
         $client = $client ?? new Client();
         $description = $description ?? new VictoriabankMiaDescription();
         parent::__construct($client, $description, null, null, null, $config);
     }
 
     /**
-     * @return \GuzzleHttp\Command\Result
      * @link https://test-ipspj.victoriabank.md/index.html#operations-Health-get_api_v1_health_status
      */
-    public function getHealthStatus()
+    public function getHealthStatus(): Result
     {
         return parent::getHealthStatus();
     }
 
     /**
      * Get tokens.
-     * @param string $grant_type
-     * @param string $username
-     * @param string $password
-     * @param string $refresh_token
-     * @return \GuzzleHttp\Command\Result
      * @link https://test-ipspj.victoriabank.md/index.html#operations-Token-post_identity_token
      */
-    public function getToken($grant_type, $username, $password, $refresh_token = null)
+    public function getToken(string $grant_type, string $username, string $password, ?string $refresh_token = null): Result
     {
         $args = [
             'grant_type' => $grant_type,
@@ -68,14 +55,9 @@ class VictoriabankMiaClient extends GuzzleClient
 
     /**
      * Register new payee-presented QR code.
-     * @param array  $qrData
-     * @param string $authToken
-     * @param int    $width
-     * @param int    $height
-     * @return \GuzzleHttp\Command\Result
      * @link https://test-ipspj.victoriabank.md/index.html#operations-Qr-post_api_v1_qr
      */
-    public function createPayeeQr($qrData, $authToken, $width = null, $height = null)
+    public function createPayeeQr(array $qrData, string $authToken, ?int $width = null, ?int $height = null): Result
     {
         $args = $qrData;
 
@@ -88,13 +70,9 @@ class VictoriabankMiaClient extends GuzzleClient
 
     /**
      * Register new extension for HYBR or STAT payee-presented QR code.
-     * @param string $qrHeaderUUID
-     * @param array  $extensionData
-     * @param string $authToken
-     * @return \GuzzleHttp\Command\Result
      * @link https://test-ipspj.victoriabank.md/index.html#operations-Qr-post_api_v1_qr__qrHeaderUUID__extentions
      */
-    public function createPayeeQrExtension($qrHeaderUUID, $extensionData, $authToken)
+    public function createPayeeQrExtension(string $qrHeaderUUID, array $extensionData, string $authToken): Result
     {
         $args = $extensionData;
 
@@ -106,12 +84,9 @@ class VictoriabankMiaClient extends GuzzleClient
 
     /**
      * Cancel payee-resented QR code, including active extension, if exists.
-     * @param string $qrHeaderUUID
-     * @param string $authToken
-     * @return \GuzzleHttp\Command\Result
      * @link https://test-ipspj.victoriabank.md/index.html#operations-Qr-delete_api_v1_qr__qrHeaderUUID_
      */
-    public function cancelPayeeQr($qrHeaderUUID, $authToken)
+    public function cancelPayeeQr(string $qrHeaderUUID, string $authToken): Result
     {
         $args = [
             'qrHeaderUUID' => $qrHeaderUUID,
@@ -123,12 +98,9 @@ class VictoriabankMiaClient extends GuzzleClient
 
     /**
      * Cancel active extension of hybrid payee-presented QR code.
-     * @param string $qrHeaderUUID
-     * @param string $authToken
-     * @return \GuzzleHttp\Command\Result
      * @link https://test-ipspj.victoriabank.md/index.html#operations-Qr-delete_api_v1_qr__qrHeaderUUID__active_extension
      */
-    public function cancelHybrExtension($qrHeaderUUID, $authToken)
+    public function cancelHybrExtension(string $qrHeaderUUID, string $authToken): Result
     {
         $args = [
             'qrHeaderUUID' => $qrHeaderUUID,
@@ -140,14 +112,9 @@ class VictoriabankMiaClient extends GuzzleClient
 
     /**
      * Get status of payee-presented QR code header, statuses of N last extensions and list of M last payments against each extension.
-     * @param string $qrHeaderUUID
-     * @param string $authToken
-     * @param int    $nbOfExt
-     * @param int    $nbOfTxs
-     * @return \GuzzleHttp\Command\Result
      * @link https://test-ipspj.victoriabank.md/index.html#operations-Qr-get_api_v1_qr__qrHeaderUUID__status
      */
-    public function getPayeeQrStatus($qrHeaderUUID, $authToken, $nbOfExt = null, $nbOfTxs = null)
+    public function getPayeeQrStatus(string $qrHeaderUUID, string $authToken, ?int $nbOfExt = null, ?int $nbOfTxs = null): Result
     {
         $args = [
             'qrHeaderUUID' => $qrHeaderUUID,
@@ -161,13 +128,9 @@ class VictoriabankMiaClient extends GuzzleClient
 
     /**
      * Get status of QR code extension and list of last N payments against it.
-     * @param string $qrExtensionUUID
-     * @param string $authToken
-     * @param int    $nbOfTxs
-     * @return \GuzzleHttp\Command\Result
      * @link https://test-ipspj.victoriabank.md/index.html#operations-Qr-get_api_v1_qr_extensions__qrExtensionUUID__status
      */
-    public function getQrExtensionStatus($qrExtensionUUID, $authToken, $nbOfTxs = null)
+    public function getQrExtensionStatus(string $qrExtensionUUID, string $authToken, ?int $nbOfTxs = null): Result
     {
         $args = [
             'qrExtensionUUID' => $qrExtensionUUID,
@@ -180,14 +143,9 @@ class VictoriabankMiaClient extends GuzzleClient
 
     /**
      * Transaction list for reconciliation.
-     * @param string $authToken
-     * @param string $dateFrom
-     * @param string $dateTo
-     * @param string $messageId
-     * @return \GuzzleHttp\Command\Result
      * @link https://test-ipspj.victoriabank.md/index.html#operations-Reconciliation-get_api_v1_reconciliation_transactions
      */
-    public function getReconciliationTransactions($authToken, $dateFrom = null, $dateTo = null, $messageId = null)
+    public function getReconciliationTransactions(string $authToken, ?string $dateFrom = null, ?string $dateTo = null, ?string $messageId = null): Result
     {
         $args = [
             'dateFrom' => $dateFrom,
@@ -201,12 +159,9 @@ class VictoriabankMiaClient extends GuzzleClient
 
     /**
      * Get Last Signal by QR Extension UUID.
-     * @param string $qrExtensionUUID
-     * @param string $authToken
-     * @return \GuzzleHttp\Command\Result
      * @link https://test-ipspj.victoriabank.md/index.html#operations-Signal-get_api_v1_signal__qrExtensionUUID_
      */
-    public function getSignal($qrExtensionUUID, $authToken)
+    public function getSignal(string $qrExtensionUUID, string $authToken): Result
     {
         $args = [
             'qrExtensionUUID' => $qrExtensionUUID,
@@ -218,12 +173,9 @@ class VictoriabankMiaClient extends GuzzleClient
 
     /**
      * Reverse already processed transaction.
-     * @param string $id
-     * @param string $authToken
-     * @return \GuzzleHttp\Command\Result
      * @link https://test-ipspj.victoriabank.md/index.html#operations-Transaction-delete_api_v1_transaction__id_
      */
-    public function reverseTransaction($id, $authToken)
+    public function reverseTransaction(string $id, string $authToken): Result
     {
         $args = [
             'id' => $id,
@@ -235,12 +187,9 @@ class VictoriabankMiaClient extends GuzzleClient
 
     /**
      * Demo Pay (Test)
-     * @param string $qrHeaderUUID
-     * @param string $authToken
-     * @return \GuzzleHttp\Command\Result
      * @link https://test-ipspj-demopay.victoriabank.md/swagger/index.html#operations-Pay-post_api_Pay
      */
-    public function demoPay($qrHeaderUUID, $authToken)
+    public function demoPay(string $qrHeaderUUID, string $authToken): Result
     {
         $args = [
             'qrHeaderUUID' => $qrHeaderUUID,
@@ -253,21 +202,15 @@ class VictoriabankMiaClient extends GuzzleClient
         return parent::demoPay($args);
     }
 
-    /**
-     * @param array  $args
-     * @param string $authToken
-     */
-    private static function setBearerAuthToken(&$args, $authToken)
+    private static function setBearerAuthToken(array &$args, string $authToken)
     {
         $args['authToken'] = "Bearer $authToken";
     }
 
     /**
      * Decode and validate the callback data signature.
-     * @param string $callbackJwt
-     * @param string $certificate
      */
-    public static function decodeValidateCallback($callbackJwt, $certificate)
+    public static function decodeValidateCallback(string $callbackJwt, string $certificate)
     {
         $algorithm = 'RS256';
         $publicKey = openssl_pkey_get_public($certificate);
@@ -278,9 +221,8 @@ class VictoriabankMiaClient extends GuzzleClient
 
     /**
      * Extract payment transaction ID from payment reference string.
-     * @param string $paymentReference
      */
-    public static function getPaymentTransactionId($paymentReference)
+    public static function getPaymentTransactionId(string $paymentReference)
     {
         //NOTE: Victoriabank MIA API provides only a composed reference string that needs to be parsed
         $transactionComponents = explode('|', $paymentReference);
@@ -291,9 +233,8 @@ class VictoriabankMiaClient extends GuzzleClient
 
     /**
      * Extract payment RRN (Retrieval Reference Number) from payment reference string.
-     * @param string $paymentReference
      */
-    public static function getPaymentRrn($paymentReference)
+    public static function getPaymentRrn(string $paymentReference)
     {
         //NOTE: Victoriabank MIA API provides only a composed transaction string that needs to be parsed
         $transactionId = self::getPaymentTransactionId($paymentReference);
