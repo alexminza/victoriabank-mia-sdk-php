@@ -222,7 +222,7 @@ class VictoriabankMiaClient extends GuzzleClient
     /**
      * Extract payment transaction ID from payment reference string.
      */
-    public static function getPaymentTransactionId(string $paymentReference)
+    public static function getPaymentTransactionId(string $paymentReference): string
     {
         //NOTE: Victoriabank MIA API provides only a composed reference string that needs to be parsed
         $transactionComponents = explode('|', $paymentReference);
@@ -234,7 +234,7 @@ class VictoriabankMiaClient extends GuzzleClient
     /**
      * Extract payment RRN (Retrieval Reference Number) from payment reference string.
      */
-    public static function getPaymentRrn(string $paymentReference)
+    public static function getPaymentRrn(string $paymentReference): string
     {
         //NOTE: Victoriabank MIA API provides only a composed transaction string that needs to be parsed
         $transactionId = self::getPaymentTransactionId($paymentReference);
