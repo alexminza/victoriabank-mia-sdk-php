@@ -269,7 +269,12 @@ class VictoriabankMiaIntegrationTest extends TestCase
      */
     public function testCancelPayeeQr()
     {
-        $response = $this->client->cancelPayeeQr(self::$hybridQrHeaderUUID, self::$accessToken);
+        $qrToCancelResponse = $this->client->createPayeeQr(self::$qrData, self::$accessToken);
+        $this->assertNotEmpty($qrToCancelResponse);
+        $this->assertArrayHasKey('qrHeaderUUID', $qrToCancelResponse);
+        $this->assertNotEmpty($qrToCancelResponse['qrHeaderUUID']);
+
+        $response = $this->client->cancelPayeeQr($qrToCancelResponse['qrHeaderUUID'], self::$accessToken);
         // $this->debugLog('cancelPayeeQr', $response);
 
         $this->assertNotNull($response);
