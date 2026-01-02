@@ -2,9 +2,9 @@
 
 namespace Victoriabank\VictoriabankMia\Tests;
 
+use Victoriabank\VictoriabankMia\VictoriabankMiaClient;
 use GuzzleHttp\Client;
 use PHPUnit\Framework\TestCase;
-use Victoriabank\VictoriabankMia\VictoriabankMiaClient;
 
 /**
  * @group integration
@@ -39,7 +39,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
         self::$publicKey = getenv('VICTORIABANK_PUBLIC_KEY');
         self::$baseUrl   = VictoriabankMiaClient::TEST_BASE_URL;
 
-        if (!self::$username || !self::$password || !self::$iban || !self::$publicKey) {
+        if (empty(self::$username) || empty(self::$password) || empty(self::$iban) || empty(self::$publicKey)) {
             self::markTestSkipped('Integration test credentials not provided.');
         }
     }
@@ -97,7 +97,8 @@ class VictoriabankMiaIntegrationTest extends TestCase
         error_log("$message: $data_print");
     }
 
-    protected function redactData($data) {
+    protected function redactData($data)
+    {
         if ($data) {
             if (isset($data['qrAsImage'])) {
                 $data['qrAsImage'] = '[REDACTED]';
@@ -112,6 +113,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
         $response = $this->client->getToken('password', self::$username, self::$password);
         // $this->debugLog('getToken', $response);
 
+        $this->assertNotEmpty($response);
         $this->assertArrayHasKey('accessToken', $response);
         $this->assertNotEmpty($response['accessToken']);
 
@@ -160,10 +162,13 @@ class VictoriabankMiaIntegrationTest extends TestCase
         $response = $this->client->createPayeeQr($qrData, self::$accessToken);
         // $this->debugLog('createPayeeQr', $response);
 
+        $this->assertNotEmpty($response);
         $this->assertArrayHasKey('qrHeaderUUID', $response);
         $this->assertArrayHasKey('qrExtensionUUID', $response);
+        $this->assertArrayHasKey('qrAsText', $response);
         $this->assertNotEmpty($response['qrHeaderUUID']);
         $this->assertNotEmpty($response['qrExtensionUUID']);
+        $this->assertNotEmpty($response['qrAsText']);
 
         self::$qrHeaderUUID = $response['qrHeaderUUID'];
         self::$qrExtensionUUID = $response['qrExtensionUUID'];
@@ -202,9 +207,13 @@ class VictoriabankMiaIntegrationTest extends TestCase
         $response = $this->client->createPayeeQr($hybridData, self::$accessToken);
         // $this->debugLog('createPayeeQr', $response);
 
+        $this->assertNotEmpty($response);
         $this->assertArrayHasKey('qrHeaderUUID', $response);
         $this->assertArrayHasKey('qrExtensionUUID', $response);
         $this->assertArrayHasKey('qrAsText', $response);
+        $this->assertNotEmpty($response['qrHeaderUUID']);
+        $this->assertNotEmpty($response['qrExtensionUUID']);
+        $this->assertNotEmpty($response['qrAsText']);
 
         self::$hybridQrHeaderUUID = $response['qrHeaderUUID'];
         self::$hybridQrExtensionUUID = $response['qrExtensionUUID'];
@@ -236,7 +245,10 @@ class VictoriabankMiaIntegrationTest extends TestCase
         $response = $this->client->createPayeeQrExtension(self::$hybridQrHeaderUUID, $extensionData, self::$accessToken);
         // $this->debugLog('createPayeeQrExtension', $response);
 
+        $this->assertNotEmpty($response);
         $this->assertArrayHasKey('body', $response);
+        $this->assertNotEmpty($response['body']);
+
         self::$hybridQrExtensionUUID = $response['body'];
     }
 
@@ -272,9 +284,11 @@ class VictoriabankMiaIntegrationTest extends TestCase
         $response = $this->client->getPayeeQrStatus(self::$qrHeaderUUID, self::$accessToken);
         // $this->debugLog('getPayeeQrStatus', $response);
 
+        $this->assertNotEmpty($response);
         $this->assertArrayHasKey('uuid', $response);
         $this->assertArrayHasKey('status', $response);
         $this->assertEquals(self::$qrHeaderUUID, $response['uuid']);
+        $this->assertNotEmpty($response['status']);
     }
 
     /**
@@ -285,9 +299,11 @@ class VictoriabankMiaIntegrationTest extends TestCase
         $response = $this->client->getQrExtensionStatus(self::$qrExtensionUUID, self::$accessToken);
         // $this->debugLog('getQrExtensionStatus', $response);
 
+        $this->assertNotEmpty($response);
         $this->assertArrayHasKey('uuid', $response);
         $this->assertArrayHasKey('status', $response);
         $this->assertEquals(self::$qrExtensionUUID, $response['uuid']);
+        $this->assertNotEmpty($response['status']);
     }
 
     /**
@@ -317,6 +333,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
 
             $this->assertNotEmpty($response);
             $this->assertArrayHasKey('status', $response);
+            $this->assertNotEmpty($response['status']);
 
             if (strtolower($response['status']) === 'paid') {
                 break;
@@ -327,12 +344,14 @@ class VictoriabankMiaIntegrationTest extends TestCase
         $this->assertNotEmpty($response['extensions'][0]['payments'], 'QR extension should have payments after demoPay');
 
         $payment = $response['extensions'][0]['payments'][0];
-        $transactionId = VictoriabankMiaClient::getPaymentTransactionId($payment['reference']);
+        $this->assertNotEmpty($payment);
+        $this->assertArrayHasKey('reference', $payment);
 
+        $transactionId = VictoriabankMiaClient::getPaymentTransactionId($payment['reference']);
         $this->assertNotEmpty($transactionId);
 
         $response = $this->client->reverseTransaction($transactionId, self::$accessToken);
-        // $this->debugLog('testReverseTransaction', $response);
+        // $this->debugLog('reverseTransaction', $response);
 
         $this->assertNotNull($response);
         $this->assertEmpty($response);
@@ -347,6 +366,10 @@ class VictoriabankMiaIntegrationTest extends TestCase
         // $this->debugLog('getSignal', $response);
 
         $this->assertNotEmpty($response);
+        $this->assertArrayHasKey('signalCode', $response);
+        $this->assertArrayHasKey('qrHeaderUUID', $response);
+        $this->assertArrayHasKey('qrExtensionUUID', $response);
+        $this->assertEquals(self::$qrExtensionUUID, $response['qrExtensionUUID']);
     }
 
     /**
@@ -361,5 +384,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
         // $this->debugLog('getReconciliationTransactions', $response);
 
         $this->assertNotEmpty($response);
+        $this->assertArrayHasKey('transactionsInfo', $response);
+        $this->assertNotEmpty($response['transactionsInfo']);
     }
 }

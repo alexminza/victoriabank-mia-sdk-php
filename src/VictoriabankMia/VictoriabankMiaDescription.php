@@ -44,8 +44,8 @@ class VictoriabankMiaDescription extends Description
 
         $description = [
             // 'baseUrl' => 'https://ips-api-pj.vb.md/',
-            'name' => 'IPS Business WebApi',
-            'version' => 'v1.0',
+            'name' => 'Victoriabank MIA API',
+            'apiVersion' => 'v1',
 
             'operations' => [
                 'baseOp' => [
@@ -57,7 +57,7 @@ class VictoriabankMiaDescription extends Description
                     ],
                 ],
 
-                // Health Operations
+                #region Health Operations
                 'getHealthStatus' => [
                     'extends' => 'baseOp',
                     'httpMethod' => 'GET',
@@ -65,8 +65,9 @@ class VictoriabankMiaDescription extends Description
                     'summary' => 'Health Status',
                     'responseModel' => 'getResponse',
                 ],
+                #endregion
 
-                // Token Operations
+                #region Token Operations
                 'getToken' => [
                     'extends' => 'baseOp',
                     'httpMethod' => 'POST',
@@ -80,8 +81,9 @@ class VictoriabankMiaDescription extends Description
                         'refresh_token' => ['type' => 'string', 'location' => 'formParam'],
                     ],
                 ],
+                #endregion
 
-                // QR Operations
+                #region QR Operations
                 'createPayeeQr' => [
                     'extends' => 'baseOp',
                     'httpMethod' => 'POST',
@@ -158,8 +160,9 @@ class VictoriabankMiaDescription extends Description
                         'nbOfTxs' => ['type' => 'integer', 'location' => 'query'],
                     ],
                 ],
+                #endregion
 
-                // Reconciliation Operations
+                #region Reconciliation Operations
                 'getReconciliationTransactions' => [
                     'extends' => 'baseOp',
                     'httpMethod' => 'GET',
@@ -173,8 +176,9 @@ class VictoriabankMiaDescription extends Description
                         'messageId' => ['type' => 'string', 'location' => 'query'],
                     ],
                 ],
+                #endregion
 
-                // Signal Operations
+                #region Signal Operations
                 'getSignal' => [
                     'extends' => 'baseOp',
                     'httpMethod' => 'GET',
@@ -185,8 +189,9 @@ class VictoriabankMiaDescription extends Description
                         'qrExtensionUUID' => ['type' => 'string', 'location' => 'uri', 'required' => true],
                     ],
                 ],
+                #endregion
 
-                // Transaction Operations
+                #region Transaction Operations
                 'reverseTransaction' => [
                     'extends' => 'baseOp',
                     'httpMethod' => 'DELETE',
@@ -197,8 +202,9 @@ class VictoriabankMiaDescription extends Description
                         'id' => ['type' => 'string', 'location' => 'uri', 'required' => true],
                     ],
                 ],
+                #endregion
 
-                // Demo Payment Operations
+                #region Demo Payment Operations
                 'demoPay' => [
                     'extends' => 'baseOp',
                     'httpMethod' => 'POST',
@@ -213,10 +219,11 @@ class VictoriabankMiaDescription extends Description
                         'schema' => ['$ref' => 'DemoPayDto']
                     ]
                 ],
+                #endregion
             ],
 
             'models' => [
-                // Generic Models
+                #region Generic Models
                 'getResponse' => [
                     'type' => 'object',
                     'additionalProperties' => [
@@ -233,8 +240,9 @@ class VictoriabankMiaDescription extends Description
                         ]
                     ]
                 ],
+                #endregion
 
-                // Schema-based Models
+                #region Schema-based Models
                 'CreatePayeeQrResponse' => [
                     'type' => 'object',
                     'additionalProperties' => false,
@@ -377,6 +385,7 @@ class VictoriabankMiaDescription extends Description
                         'qrHeaderUUID' => ['type' => 'string', 'required' => true],
                     ],
                 ],
+                #endregion
             ],
         ];
 

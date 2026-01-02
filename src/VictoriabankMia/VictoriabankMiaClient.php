@@ -7,7 +7,6 @@ use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Command\Guzzle\DescriptionInterface;
 use GuzzleHttp\Command\Guzzle\GuzzleClient;
 use GuzzleHttp\Command\Result;
-
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 
@@ -60,7 +59,6 @@ class VictoriabankMiaClient extends GuzzleClient
     public function createPayeeQr(array $qrData, string $authToken, ?int $width = null, ?int $height = null): Result
     {
         $args = $qrData;
-
         $args['width'] = $width;
         $args['height'] = $height;
 
@@ -75,7 +73,6 @@ class VictoriabankMiaClient extends GuzzleClient
     public function createPayeeQrExtension(string $qrHeaderUUID, array $extensionData, string $authToken): Result
     {
         $args = $extensionData;
-
         $args['qrHeaderUUID'] = $qrHeaderUUID;
 
         self::setBearerAuthToken($args, $authToken);
@@ -221,10 +218,10 @@ class VictoriabankMiaClient extends GuzzleClient
 
     /**
      * Extract payment transaction ID from payment reference string.
+     * Victoriabank MIA API provides only a composed reference string that needs to be parsed.
      */
     public static function getPaymentTransactionId(string $paymentReference): string
     {
-        //NOTE: Victoriabank MIA API provides only a composed reference string that needs to be parsed
         $transactionComponents = explode('|', $paymentReference);
         $transactionId = $transactionComponents[3];
 
@@ -233,10 +230,10 @@ class VictoriabankMiaClient extends GuzzleClient
 
     /**
      * Extract payment RRN (Retrieval Reference Number) from payment reference string.
+     * Victoriabank MIA API provides only a composed transaction string that needs to be parsed.
      */
     public static function getPaymentRrn(string $paymentReference): string
     {
-        //NOTE: Victoriabank MIA API provides only a composed transaction string that needs to be parsed
         $transactionId = self::getPaymentTransactionId($paymentReference);
         $paymentRrn = strlen($transactionId) > 12
             ? substr($transactionId, -12)
