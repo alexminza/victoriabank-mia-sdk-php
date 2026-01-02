@@ -101,7 +101,8 @@ class VictoriabankMiaIntegrationTest extends TestCase
     {
         if (is_array($data)) {
             if (isset($data['qrAsImage'])) {
-                $data['qrAsImage'] = '[REDACTED]';
+                // NOTE: remove redundant large image data
+                $data['qrAsImage'] = null;
             }
         }
 
