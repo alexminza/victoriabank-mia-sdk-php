@@ -99,7 +99,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
 
     protected function redactData($data)
     {
-        if ($data) {
+        if (is_array($data)) {
             if (isset($data['qrAsImage'])) {
                 $data['qrAsImage'] = '[REDACTED]';
             }
