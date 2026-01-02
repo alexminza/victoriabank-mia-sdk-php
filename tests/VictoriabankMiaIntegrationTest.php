@@ -74,7 +74,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
             // https://github.com/guzzle/guzzle/issues/2185
             if ($t instanceof \GuzzleHttp\Command\Exception\CommandException) {
                 $response = $t->getResponse();
-                $responseBody = (string) $response->getBody();
+                $responseBody = !empty($response) ? (string) $response->getBody() : '';
                 $exceptionMessage = $t->getMessage();
 
                 $this->debugLog($responseBody, $exceptionMessage);
@@ -323,10 +323,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
         $this->assertEmpty($response);
     }
 
-    /**
-     * @depends testDemoPay
-     */
-    public function testReverseTransaction()
+    protected function waitDemoPay()
     {
         $maxRetries = 5;
         $response = null;
@@ -345,8 +342,21 @@ class VictoriabankMiaIntegrationTest extends TestCase
             }
         }
 
+        $this->assertNotEmpty($response);
+        $this->assertArrayHasKey('extensions', $response);
         $this->assertNotEmpty($response['extensions'], 'QR status should have extensions');
+        $this->assertArrayHasKey('payments', $response['extensions'][0]);
         $this->assertNotEmpty($response['extensions'][0]['payments'], 'QR extension should have payments after demoPay');
+
+        return $response;
+    }
+
+    /**
+     * @depends testGetSignal
+     */
+    public function testReverseTransaction()
+    {
+        $response = $this->waitDemoPay();
 
         $payment = $response['extensions'][0]['payments'][0];
         $this->assertNotEmpty($payment);
@@ -367,6 +377,8 @@ class VictoriabankMiaIntegrationTest extends TestCase
      */
     public function testGetSignal()
     {
+        $response = $this->waitDemoPay();
+
         $response = $this->client->getSignal(self::$qrExtensionUUID, self::$accessToken);
         // $this->debugLog('getSignal', $response);
 
