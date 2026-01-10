@@ -14,7 +14,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
     protected static $username;
     protected static $password;
     protected static $iban;
-    protected static $publicKey;
+    protected static $certificate;
     protected static $baseUrl;
 
     // Shared state
@@ -33,13 +33,14 @@ class VictoriabankMiaIntegrationTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        self::$username  = getenv('VICTORIABANK_MIA_USERNAME');
-        self::$password  = getenv('VICTORIABANK_MIA_PASSWORD');
-        self::$iban      = getenv('VICTORIABANK_IBAN');
-        self::$publicKey = getenv('VICTORIABANK_PUBLIC_KEY');
-        self::$baseUrl   = VictoriabankMiaClient::TEST_BASE_URL;
+        self::$username    = getenv('VB_MIA_USERNAME');
+        self::$password    = getenv('VB_MIA_PASSWORD');
+        self::$iban        = getenv('VB_IBAN');
+        self::$certificate = getenv('VB_CERTIFICATE');
 
-        if (empty(self::$username) || empty(self::$password) || empty(self::$iban) || empty(self::$publicKey)) {
+        self::$baseUrl = VictoriabankMiaClient::TEST_BASE_URL;
+
+        if (empty(self::$username) || empty(self::$password) || empty(self::$iban) || empty(self::$certificate)) {
             self::markTestSkipped('Integration test credentials not provided.');
         }
     }
@@ -48,7 +49,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
     {
         $options = [
             'base_uri' => self::$baseUrl,
-            'timeout' => 15
+            'timeout' => 30
         ];
 
         #region Logging
@@ -404,5 +405,16 @@ class VictoriabankMiaIntegrationTest extends TestCase
         $this->assertNotEmpty($response);
         $this->assertArrayHasKey('transactionsInfo', $response);
         $this->assertNotEmpty($response['transactionsInfo']);
+    }
+
+    public function testDecodeValidateCallback()
+    {
+        $callbackBody = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaWduYWxDb2RlIjoiRXhwaXJhdGlvbiIsInNpZ25hbER0VG0iOiIyMDI0LTEwLTAxVDE1OjA3OjQ1KzAzOjAwIiwicXJIZWFkZXJVVUlEIjoiYmQxMjA0OWItNjUxZC00MGEwLWIyYmMtZDZhMGY3ZTJiN2M3IiwicXJFeHRlbnNpb25VVUlEIjoiNjU0YWNkNjktNjAyYy00MzUxLTk1OTItODE0M2FlMjhkM2U0IiwicGF5bWVudCI6bnVsbH0.WJ5t8jtg2_6DPrxQNIcu50gsW7cDC8IMdjvOBO9wW3toIdeAljlMPxd_lLCWJiKXToRAVHU7a1EB4mLyzyw1iCcRadnsSqm21TrpDZWTjv3uL-XiMLrWOsGBf0aJJRFcGbysU_ym9YLonQMmYLF0voq39yAPMHO7CLCniSMhVdJ9Q5xnrq52y6Yn5YzefCNb2tAQ-erm-8_mCaF0DWd0UFhPA6TRXyV2l5GCkLbyhlUB9gVoVTdSN-XxA_1aoNTusheZPDH1InL03Bx3G8muaVxOMrMIsVCJJYAaTFKiQTBf0M49oTQpdPWeeS9wHaS7aSS3gUcFsOOEPavj7J8vxg';
+        $callbackData = (array) VictoriabankMiaClient::decodeValidateCallback($callbackBody, self::$certificate);
+        // $this->debugLog('decodeValidateCallback', $callbackData);
+
+        $this->assertNotEmpty($callbackData);
+        $this->assertArrayHasKey('signalCode', $callbackData);
+        $this->assertEquals('Expiration', $callbackData['signalCode']);
     }
 }
