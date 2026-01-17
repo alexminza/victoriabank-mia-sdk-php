@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Victoriabank\VictoriabankMia\Tests;
 
 use Victoriabank\VictoriabankMia\VictoriabankMiaClient;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Victoriabank\VictoriabankMia;
 
 use GuzzleHttp\Command\Guzzle\Description;
@@ -7,6 +9,7 @@ use Composer\InstalledVersions;
 
 /**
  * Victoriabank MIA API service description
+ *
  * @link https://test-ipspj.victoriabank.md
  * @link https://test-ipspj-demopay.victoriabank.md/swagger/
  */

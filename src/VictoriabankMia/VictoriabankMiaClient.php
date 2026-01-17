@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Victoriabank\VictoriabankMia;
 
 use GuzzleHttp\Client;
@@ -12,6 +14,7 @@ use Firebase\JWT\Key;
 
 /**
  * Victoriabank MIA API client
+ *
  * @link https://test-ipspj.victoriabank.md
  * @link https://test-ipspj-demopay.victoriabank.md/swagger/
  */
@@ -38,6 +41,7 @@ class VictoriabankMiaClient extends GuzzleClient
 
     /**
      * Get tokens.
+     *
      * @link https://test-ipspj.victoriabank.md/index.html#operations-Token-post_identity_token
      */
     public function getToken(string $grant_type, string $username, string $password, ?string $refresh_token = null): Result
@@ -54,6 +58,7 @@ class VictoriabankMiaClient extends GuzzleClient
 
     /**
      * Register new payee-presented QR code.
+     *
      * @link https://test-ipspj.victoriabank.md/index.html#operations-Qr-post_api_v1_qr
      */
     public function createPayeeQr(array $qrData, string $authToken, ?int $width = null, ?int $height = null): Result
@@ -68,6 +73,7 @@ class VictoriabankMiaClient extends GuzzleClient
 
     /**
      * Register new extension for HYBR or STAT payee-presented QR code.
+     *
      * @link https://test-ipspj.victoriabank.md/index.html#operations-Qr-post_api_v1_qr__qrHeaderUUID__extentions
      */
     public function createPayeeQrExtension(string $qrHeaderUUID, array $extensionData, string $authToken): Result
@@ -81,6 +87,7 @@ class VictoriabankMiaClient extends GuzzleClient
 
     /**
      * Cancel payee-resented QR code, including active extension, if exists.
+     *
      * @link https://test-ipspj.victoriabank.md/index.html#operations-Qr-delete_api_v1_qr__qrHeaderUUID_
      */
     public function cancelPayeeQr(string $qrHeaderUUID, string $authToken): Result
@@ -95,6 +102,7 @@ class VictoriabankMiaClient extends GuzzleClient
 
     /**
      * Cancel active extension of hybrid payee-presented QR code.
+     *
      * @link https://test-ipspj.victoriabank.md/index.html#operations-Qr-delete_api_v1_qr__qrHeaderUUID__active_extension
      */
     public function cancelHybrExtension(string $qrHeaderUUID, string $authToken): Result
@@ -109,6 +117,7 @@ class VictoriabankMiaClient extends GuzzleClient
 
     /**
      * Get status of payee-presented QR code header, statuses of N last extensions and list of M last payments against each extension.
+     *
      * @link https://test-ipspj.victoriabank.md/index.html#operations-Qr-get_api_v1_qr__qrHeaderUUID__status
      */
     public function getPayeeQrStatus(string $qrHeaderUUID, string $authToken, ?int $nbOfExt = null, ?int $nbOfTxs = null): Result
@@ -125,6 +134,7 @@ class VictoriabankMiaClient extends GuzzleClient
 
     /**
      * Get status of QR code extension and list of last N payments against it.
+     *
      * @link https://test-ipspj.victoriabank.md/index.html#operations-Qr-get_api_v1_qr_extensions__qrExtensionUUID__status
      */
     public function getQrExtensionStatus(string $qrExtensionUUID, string $authToken, ?int $nbOfTxs = null): Result
@@ -140,6 +150,7 @@ class VictoriabankMiaClient extends GuzzleClient
 
     /**
      * Transaction list for reconciliation.
+     *
      * @link https://test-ipspj.victoriabank.md/index.html#operations-Reconciliation-get_api_v1_reconciliation_transactions
      */
     public function getReconciliationTransactions(string $authToken, ?string $dateFrom = null, ?string $dateTo = null, ?string $messageId = null): Result
@@ -156,6 +167,7 @@ class VictoriabankMiaClient extends GuzzleClient
 
     /**
      * Get Last Signal by QR Extension UUID.
+     *
      * @link https://test-ipspj.victoriabank.md/index.html#operations-Signal-get_api_v1_signal__qrExtensionUUID_
      */
     public function getSignal(string $qrExtensionUUID, string $authToken): Result
@@ -170,6 +182,7 @@ class VictoriabankMiaClient extends GuzzleClient
 
     /**
      * Reverse already processed transaction.
+     *
      * @link https://test-ipspj.victoriabank.md/index.html#operations-Transaction-delete_api_v1_transaction__id_
      */
     public function reverseTransaction(string $id, string $authToken): Result
@@ -184,6 +197,7 @@ class VictoriabankMiaClient extends GuzzleClient
 
     /**
      * Demo Pay (Test)
+     *
      * @link https://test-ipspj-demopay.victoriabank.md/swagger/index.html#operations-Pay-post_api_Pay
      */
     public function demoPay(string $qrHeaderUUID, string $authToken): Result
@@ -206,6 +220,8 @@ class VictoriabankMiaClient extends GuzzleClient
 
     /**
      * Decode and validate the callback data signature.
+     *
+     * @see Firebase\JWT\JWT::decode
      */
     public static function decodeValidateCallback(string $callbackJwt, string $certificate)
     {
