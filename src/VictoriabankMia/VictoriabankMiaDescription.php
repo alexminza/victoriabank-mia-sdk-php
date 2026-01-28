@@ -87,8 +87,8 @@ class VictoriabankMiaDescription extends Description
             'MoneyDto' => [
                 'type' => 'object',
                 'properties' => [
-                    'sum' => ['type' => 'number'],
-                    'currency' => ['type' => 'string'],
+                    'sum' => ['type' => 'number', 'required' => true],
+                    'currency' => ['type' => 'string', 'required' => true],
                 ],
             ],
             'PayeeAccountDto' => [
@@ -154,6 +154,7 @@ class VictoriabankMiaDescription extends Description
                     'paymentType' => ['type' => 'string'],
                     'miaId' => ['type' => 'string'],
                     'creditorRef' => ['type' => 'string'],
+                    'iban' => ['type' => 'string'],
                 ],
             ],
             'TransactionListDto' => [
@@ -277,7 +278,7 @@ class VictoriabankMiaDescription extends Description
                     'extends' => 'baseOp',
                     'httpMethod' => 'DELETE',
                     'uri' => '/api/v1/qr/{qrHeaderUUID}',
-                    'summary' => 'CancelPayeeQr-Cancel payee-resented QR code',
+                    'summary' => 'CancelPayeeQr-Cancel payee-resented QR code, including active extension, if exists',
                     'parameters' => [
                         'authToken' => $authorizationHeader,
                         'qrHeaderUUID' => ['type' => 'string', 'location' => 'uri', 'required' => true],
@@ -287,7 +288,7 @@ class VictoriabankMiaDescription extends Description
                     'extends' => 'baseOp',
                     'httpMethod' => 'DELETE',
                     'uri' => '/api/v1/qr/{qrHeaderUUID}/active-extension',
-                    'summary' => 'Cancel active extension of hybrid payee-presented QR code',
+                    'summary' => 'CancelHybrExtention - Cancel active extension of hybrid payee-presented QR code',
                     'parameters' => [
                         'authToken' => $authorizationHeader,
                         'qrHeaderUUID' => ['type' => 'string', 'location' => 'uri', 'required' => true],
@@ -297,7 +298,7 @@ class VictoriabankMiaDescription extends Description
                     'extends' => 'baseOp',
                     'httpMethod' => 'GET',
                     'uri' => '/api/v1/qr/{qrHeaderUUID}/status',
-                    'summary' => 'Get status of payee-presented QR code header',
+                    'summary' => 'getPayeeQrStatus - Get status of payee-presented QR code header, statuses of N last extensions and list of M last payments against each extension',
                     'responseModel' => 'getResponse',
                     'parameters' => [
                         'authToken' => $authorizationHeader,
@@ -310,7 +311,7 @@ class VictoriabankMiaDescription extends Description
                     'extends' => 'baseOp',
                     'httpMethod' => 'GET',
                     'uri' => '/api/v1/qr-extensions/{qrExtensionUUID}/status',
-                    'summary' => 'Get status of QR code extension',
+                    'summary' => 'getQrExtensionStatus - Get status of QR code extension and list of last N payments against it',
                     'responseModel' => 'getResponse',
                     'parameters' => [
                         'authToken' => $authorizationHeader,
