@@ -166,7 +166,7 @@ class VictoriabankMiaDescription extends Description
                 'type' => 'object',
                 'properties' => [
                     'length' => ['type' => 'integer'],
-                    'units' => ['type' => ['string', 'null'], 'pattern' => '^(ss|mm)$'],
+                    'units' => ['type' => ['string', 'null'], 'enum' => ['ss', 'mm']],
                 ],
             ],
             'VbPayeeQrDto' => [
