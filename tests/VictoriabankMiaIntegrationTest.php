@@ -182,6 +182,41 @@ class VictoriabankMiaIntegrationTest extends TestCase
     /**
      * @depends testAuthenticate
      */
+    public function testCreatePayeeQrValidationError()
+    {
+        $qrData = [
+            'header' => [
+                'qrType' => 'DYNM',
+                'amountType' => 'Fixed',
+                'pmtContext' => 'e'
+            ],
+            'extension' => [
+                'amount' => [
+                    'sum' => 10.00,
+                    'currencyABC' => 'MDL' // Invalid field
+                ],
+                'ttl' => [
+                    'length' => 60,
+                    'units' => 'hh' // Invalid field
+                ]
+            ]
+        ];
+
+        try {
+            $this->expectException(\GuzzleHttp\Command\Exception\CommandException::class);
+            $this->expectExceptionMessage('[currency] is a required string');
+
+            $response = $this->client->createPayeeQr($qrData, self::$accessToken);
+            $this->debugLog('createPayeeQr', $response);
+        } catch(\Exception $ex) {
+            $this->debugLog('qrCreate', $ex->getMessage());
+            throw $ex;
+        }
+    }
+
+    /**
+     * @depends testAuthenticate
+     */
     public function testCreatePayeeQrHybrid()
     {
         $hybridData = [
