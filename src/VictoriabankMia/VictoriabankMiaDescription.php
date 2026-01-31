@@ -298,7 +298,7 @@ class VictoriabankMiaDescription extends Description
                     'extends' => 'baseOp',
                     'httpMethod' => 'DELETE',
                     'uri' => '/api/v1/qr/{qrHeaderUUID}',
-                    'summary' => 'CancelPayeeQr-Cancel payee-resented QR code, including active extension, if exists',
+                    'summary' => 'CancelPayeeQr - Cancel payee-presented QR code, including active extension, if exists',
                     'parameters' => [
                         'authToken' => $authorizationHeader,
                         'qrHeaderUUID' => ['type' => 'string', 'location' => 'uri', 'required' => true],

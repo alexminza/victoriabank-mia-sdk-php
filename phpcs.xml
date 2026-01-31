@@ -35,8 +35,4 @@
     <rule ref="Generic.NamingConventions.CamelCapsFunctionName.ScopeNotCamelCaps">
         <type>warning</type>
     </rule>
-
-    <rule ref="Generic.Commenting.DocComment.ShortNotCapital">
-        <type>warning</type>
-    </rule>
 </ruleset>

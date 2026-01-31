@@ -232,11 +232,8 @@ class VictoriabankMiaClient extends GuzzleClient
      */
     public static function decodeValidateCallback(string $callbackJwt, string $certificate)
     {
-        $algorithm       = 'RS256';
-        $publicKey       = openssl_pkey_get_public($certificate);
-        $decoded_payload = JWT::decode($callbackJwt, new Key($publicKey, $algorithm));
-
-        return $decoded_payload;
+        $key = new Key($certificate, 'RS256');
+        return JWT::decode($callbackJwt, $key);
     }
     #endregion
 
@@ -245,10 +242,13 @@ class VictoriabankMiaClient extends GuzzleClient
      * Extract payment transaction ID from payment reference string.
      * Victoriabank MIA API provides only a composed reference string that needs to be parsed.
      */
-    public static function getPaymentTransactionId(string $paymentReference): string
+    public static function getPaymentTransactionId(string $paymentReference)
     {
         $transactionComponents = explode('|', $paymentReference);
-        $transactionId         = $transactionComponents[3];
+
+        $transactionId = count($transactionComponents) >= 4
+            ? $transactionComponents[3]
+            : null;
 
         return $transactionId;
     }
@@ -260,7 +260,8 @@ class VictoriabankMiaClient extends GuzzleClient
     public static function getPaymentRrn(string $paymentReference): string
     {
         $transactionId = self::getPaymentTransactionId($paymentReference);
-        $paymentRrn    = strlen($transactionId) > 12
+
+        $paymentRrn = strlen($transactionId) > 12
             ? substr($transactionId, -12)
             : $transactionId;
 
