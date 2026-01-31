@@ -55,8 +55,8 @@ class VictoriabankMiaIntegrationTest extends TestCase
         ];
 
         #region Logging
-        $classParts = explode('\\', self::class);
-        $logName = end($classParts) . '_guzzle';
+        $classParts  = explode('\\', self::class);
+        $logName     = end($classParts) . '_guzzle';
         $logFileName = "$logName.log";
 
         $log = new \Monolog\Logger($logName);
@@ -76,8 +76,8 @@ class VictoriabankMiaIntegrationTest extends TestCase
         if ($this->isDebugMode()) {
             // https://github.com/guzzle/guzzle/issues/2185
             if ($t instanceof \GuzzleHttp\Command\Exception\CommandException) {
-                $response = $t->getResponse();
-                $responseBody = !empty($response) ? (string) $response->getBody() : '';
+                $response         = $t->getResponse();
+                $responseBody     = !empty($response) ? strval($response->getBody()) : '';
                 $exceptionMessage = $t->getMessage();
 
                 $this->debugLog($responseBody, $exceptionMessage);
@@ -95,7 +95,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
 
     protected function debugLog($message, $data)
     {
-        $data = $this->redactData($data);
+        $data       = $this->redactData($data);
         $data_print = print_r($data, true);
         error_log("$message: $data_print");
     }
@@ -174,9 +174,9 @@ class VictoriabankMiaIntegrationTest extends TestCase
         $this->assertNotEmpty($response['qrExtensionUUID']);
         $this->assertNotEmpty($response['qrAsText']);
 
-        self::$qrHeaderUUID = $response['qrHeaderUUID'];
+        self::$qrHeaderUUID    = $response['qrHeaderUUID'];
         self::$qrExtensionUUID = $response['qrExtensionUUID'];
-        self::$qrData = $qrData;
+        self::$qrData          = $qrData;
     }
 
     /**
@@ -254,9 +254,9 @@ class VictoriabankMiaIntegrationTest extends TestCase
         $this->assertNotEmpty($response['qrExtensionUUID']);
         $this->assertNotEmpty($response['qrAsText']);
 
-        self::$hybridQrHeaderUUID = $response['qrHeaderUUID'];
+        self::$hybridQrHeaderUUID    = $response['qrHeaderUUID'];
         self::$hybridQrExtensionUUID = $response['qrExtensionUUID'];
-        self::$hybridQrData = $hybridData;
+        self::$hybridQrData          = $hybridData;
     }
 
     /**
@@ -365,7 +365,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
     protected function waitDemoPay()
     {
         $maxRetries = 5;
-        $response = null;
+        $response   = null;
 
         for ($i = 0; $i < $maxRetries; $i++) {
             sleep(5);
@@ -434,7 +434,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
     public function testGetReconciliationTransactions()
     {
         $dateFrom = (new \DateTime('today'))->format('Y-m-d\TH:i:s\Z'); // '-1 day'
-        $dateTo = (new \DateTime('tomorrow'))->format('Y-m-d\TH:i:s\Z'); // '+1 day'
+        $dateTo   = (new \DateTime('tomorrow'))->format('Y-m-d\TH:i:s\Z'); // '+1 day'
 
         $response = $this->client->getReconciliationTransactions(self::$accessToken, $dateFrom, $dateTo);
         // $this->debugLog('getReconciliationTransactions', $response);

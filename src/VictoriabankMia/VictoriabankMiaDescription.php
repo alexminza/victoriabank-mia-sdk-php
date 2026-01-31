@@ -15,7 +15,7 @@ use Composer\InstalledVersions;
  */
 class VictoriabankMiaDescription extends Description
 {
-    private const PACKAGE_NAME = 'alexminza/victoriabank-mia-sdk';
+    private const PACKAGE_NAME    = 'alexminza/victoriabank-mia-sdk';
     private const DEFAULT_VERSION = 'dev';
 
     private static function detectVersion(): string
@@ -34,7 +34,7 @@ class VictoriabankMiaDescription extends Description
 
     public function __construct(array $options = [])
     {
-        $version = self::detectVersion();
+        $version   = self::detectVersion();
         $userAgent = "victoriabank-mia-sdk-php/$version";
 
         $authorizationHeader = [
@@ -256,7 +256,7 @@ class VictoriabankMiaDescription extends Description
                 ],
                 #endregion
 
-                #region Token Operations
+                #region Authentication Operations
                 'getToken' => [
                     'extends' => 'baseOp',
                     'httpMethod' => 'POST',
@@ -345,7 +345,7 @@ class VictoriabankMiaDescription extends Description
                 ],
                 #endregion
 
-                #region Reconciliation Operations
+                #region Transaction Operations
                 'getReconciliationTransactions' => [
                     'extends' => 'baseOp',
                     'httpMethod' => 'GET',
@@ -355,6 +355,18 @@ class VictoriabankMiaDescription extends Description
                     'parameters' => array_merge([
                         'authToken' => $authorizationHeader,
                     ], self::getProperties($models, 'ReconciliationTransactionsDto', 'query')),
+                    'additionalParameters' => ['location' => 'query'],
+                ],
+
+                'reverseTransaction' => [
+                    'extends' => 'baseOp',
+                    'httpMethod' => 'DELETE',
+                    'uri' => '/api/v1/transaction/{id}',
+                    'summary' => 'Reverse already processed transaction',
+                    'parameters' => [
+                        'authToken' => $authorizationHeader,
+                        'id' => ['type' => 'string', 'location' => 'uri', 'required' => true],
+                    ],
                     'additionalParameters' => ['location' => 'query'],
                 ],
                 #endregion
@@ -368,20 +380,6 @@ class VictoriabankMiaDescription extends Description
                     'parameters' => [
                         'authToken' => $authorizationHeader,
                         'qrExtensionUUID' => ['type' => 'string', 'location' => 'uri', 'required' => true],
-                    ],
-                    'additionalParameters' => ['location' => 'query'],
-                ],
-                #endregion
-
-                #region Transaction Operations
-                'reverseTransaction' => [
-                    'extends' => 'baseOp',
-                    'httpMethod' => 'DELETE',
-                    'uri' => '/api/v1/transaction/{id}',
-                    'summary' => 'Reverse already processed transaction',
-                    'parameters' => [
-                        'authToken' => $authorizationHeader,
-                        'id' => ['type' => 'string', 'location' => 'uri', 'required' => true],
                     ],
                     'additionalParameters' => ['location' => 'query'],
                 ],
@@ -413,12 +411,12 @@ class VictoriabankMiaDescription extends Description
      */
     private static function getProperties(array $models, string $modelName, string $location = 'json'): array
     {
-        $props = $models[$modelName]['properties'] ?? [];
+        $props  = $models[$modelName]['properties'] ?? [];
         $result = [];
 
         foreach ($props as $name => $prop) {
             $prop['location'] = $location;
-            $result[$name] = $prop;
+            $result[$name]    = $prop;
         }
 
         return $result;

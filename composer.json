@@ -9,8 +9,7 @@
         "qr",
         "payments",
         "api",
-        "sdk",
-        "php"
+        "sdk"
     ],
     "homepage": "https://github.com/alexminza/victoriabank-mia-sdk-php",
     "license": "GPL-3.0-or-later",
@@ -43,11 +42,17 @@
     "require-dev": {
         "vlucas/phpdotenv": "*",
         "phpunit/phpunit": "*",
-        "monolog/monolog": "*"
+        "monolog/monolog": "*",
+        "squizlabs/php_codesniffer": "*",
+        "phpcompatibility/php-compatibility": "*",
+        "dealerdirect/phpcodesniffer-composer-installer": "*"
     },
     "config": {
         "platform": {
             "php": "7.2.5"
+        },
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
         }
     }
 }

@@ -21,16 +21,18 @@ use Firebase\JWT\Key;
 class VictoriabankMiaClient extends GuzzleClient
 {
     public const DEFAULT_BASE_URL = 'https://ips-api-pj.vb.md/';
-    public const TEST_BASE_URL = 'https://test-ipspj.victoriabank.md/';
+    public const TEST_BASE_URL    = 'https://test-ipspj.victoriabank.md/';
     public const TEST_DEMOPAY_URL = 'https://test-ipspj-demopay.victoriabank.md/';
 
     public function __construct(?ClientInterface $client = null, ?DescriptionInterface $description = null, array $config = [])
     {
-        $client = $client ?? new Client();
+        $client      = $client ?? new Client();
         $description = $description ?? new VictoriabankMiaDescription();
+
         parent::__construct($client, $description, null, null, null, $config);
     }
 
+    #region Health
     /**
      * @link https://test-ipspj.victoriabank.md/index.html#operations-Health-get_api_v1_health_status
      */
@@ -38,7 +40,9 @@ class VictoriabankMiaClient extends GuzzleClient
     {
         return parent::getHealthStatus();
     }
+    #endregion
 
+    #region Authentication
     /**
      * Get tokens.
      *
@@ -46,16 +50,18 @@ class VictoriabankMiaClient extends GuzzleClient
      */
     public function getToken(string $grant_type, string $username, string $password, ?string $refresh_token = null): Result
     {
-        $args = [
+        $getTokenData = [
             'grant_type' => $grant_type,
             'username' => $username,
             'password' => $password,
             'refresh_token' => $refresh_token
         ];
 
-        return parent::getToken($args);
+        return parent::getToken($getTokenData);
     }
+    #endregion
 
+    #region QR
     /**
      * Register new payee-presented QR code.
      *
@@ -63,12 +69,11 @@ class VictoriabankMiaClient extends GuzzleClient
      */
     public function createPayeeQr(array $qrData, string $authToken, ?int $width = null, ?int $height = null): Result
     {
-        $args = $qrData;
-        $args['width'] = $width;
-        $args['height'] = $height;
+        $qrData['width']  = $width;
+        $qrData['height'] = $height;
 
-        self::setBearerAuthToken($args, $authToken);
-        return parent::createPayeeQr($args);
+        self::setBearerAuthToken($qrData, $authToken);
+        return parent::createPayeeQr($qrData);
     }
 
     /**
@@ -78,11 +83,10 @@ class VictoriabankMiaClient extends GuzzleClient
      */
     public function createPayeeQrExtension(string $qrHeaderUUID, array $extensionData, string $authToken): Result
     {
-        $args = $extensionData;
-        $args['qrHeaderUUID'] = $qrHeaderUUID;
+        $extensionData['qrHeaderUUID'] = $qrHeaderUUID;
 
-        self::setBearerAuthToken($args, $authToken);
-        return parent::createPayeeQrExtension($args);
+        self::setBearerAuthToken($extensionData, $authToken);
+        return parent::createPayeeQrExtension($extensionData);
     }
 
     /**
@@ -92,12 +96,12 @@ class VictoriabankMiaClient extends GuzzleClient
      */
     public function cancelPayeeQr(string $qrHeaderUUID, string $authToken): Result
     {
-        $args = [
+        $cancelPayeeQrData = [
             'qrHeaderUUID' => $qrHeaderUUID,
         ];
 
-        self::setBearerAuthToken($args, $authToken);
-        return parent::cancelPayeeQr($args);
+        self::setBearerAuthToken($cancelPayeeQrData, $authToken);
+        return parent::cancelPayeeQr($cancelPayeeQrData);
     }
 
     /**
@@ -107,12 +111,12 @@ class VictoriabankMiaClient extends GuzzleClient
      */
     public function cancelHybrExtension(string $qrHeaderUUID, string $authToken): Result
     {
-        $args = [
+        $cancelHybrExtensionData = [
             'qrHeaderUUID' => $qrHeaderUUID,
         ];
 
-        self::setBearerAuthToken($args, $authToken);
-        return parent::cancelHybrExtension($args);
+        self::setBearerAuthToken($cancelHybrExtensionData, $authToken);
+        return parent::cancelHybrExtension($cancelHybrExtensionData);
     }
 
     /**
@@ -122,14 +126,14 @@ class VictoriabankMiaClient extends GuzzleClient
      */
     public function getPayeeQrStatus(string $qrHeaderUUID, string $authToken, ?int $nbOfExt = null, ?int $nbOfTxs = null): Result
     {
-        $args = [
+        $getPayeeQrStatusData = [
             'qrHeaderUUID' => $qrHeaderUUID,
             'nbOfExt' => $nbOfExt,
             'nbOfTxs' => $nbOfTxs,
         ];
 
-        self::setBearerAuthToken($args, $authToken);
-        return parent::getPayeeQrStatus($args);
+        self::setBearerAuthToken($getPayeeQrStatusData, $authToken);
+        return parent::getPayeeQrStatus($getPayeeQrStatusData);
     }
 
     /**
@@ -139,15 +143,17 @@ class VictoriabankMiaClient extends GuzzleClient
      */
     public function getQrExtensionStatus(string $qrExtensionUUID, string $authToken, ?int $nbOfTxs = null): Result
     {
-        $args = [
+        $getQrExtensionStatusData = [
             'qrExtensionUUID' => $qrExtensionUUID,
             'nbOfTxs' => $nbOfTxs,
         ];
 
-        self::setBearerAuthToken($args, $authToken);
-        return parent::getQrExtensionStatus($args);
+        self::setBearerAuthToken($getQrExtensionStatusData, $authToken);
+        return parent::getQrExtensionStatus($getQrExtensionStatusData);
     }
+    #endregion
 
+    #region Transaction
     /**
      * Transaction list for reconciliation.
      *
@@ -155,29 +161,14 @@ class VictoriabankMiaClient extends GuzzleClient
      */
     public function getReconciliationTransactions(string $authToken, ?string $dateFrom = null, ?string $dateTo = null, ?string $messageId = null): Result
     {
-        $args = [
+        $getReconciliationTransactionsData = [
             'dateFrom' => $dateFrom,
             'dateTo' => $dateTo,
             'messageId' => $messageId,
         ];
 
-        self::setBearerAuthToken($args, $authToken);
-        return parent::getReconciliationTransactions($args);
-    }
-
-    /**
-     * Get Last Signal by QR Extension UUID.
-     *
-     * @link https://test-ipspj.victoriabank.md/index.html#operations-Signal-get_api_v1_signal__qrExtensionUUID_
-     */
-    public function getSignal(string $qrExtensionUUID, string $authToken): Result
-    {
-        $args = [
-            'qrExtensionUUID' => $qrExtensionUUID,
-        ];
-
-        self::setBearerAuthToken($args, $authToken);
-        return parent::getSignal($args);
+        self::setBearerAuthToken($getReconciliationTransactionsData, $authToken);
+        return parent::getReconciliationTransactions($getReconciliationTransactionsData);
     }
 
     /**
@@ -187,14 +178,33 @@ class VictoriabankMiaClient extends GuzzleClient
      */
     public function reverseTransaction(string $id, string $authToken): Result
     {
-        $args = [
+        $reverseTransactionData = [
             'id' => $id,
         ];
 
-        self::setBearerAuthToken($args, $authToken);
-        return parent::reverseTransaction($args);
+        self::setBearerAuthToken($reverseTransactionData, $authToken);
+        return parent::reverseTransaction($reverseTransactionData);
     }
+    #endregion
 
+    #region Signal
+    /**
+     * Get Last Signal by QR Extension UUID.
+     *
+     * @link https://test-ipspj.victoriabank.md/index.html#operations-Signal-get_api_v1_signal__qrExtensionUUID_
+     */
+    public function getSignal(string $qrExtensionUUID, string $authToken): Result
+    {
+        $getSignalData = [
+            'qrExtensionUUID' => $qrExtensionUUID,
+        ];
+
+        self::setBearerAuthToken($getSignalData, $authToken);
+        return parent::getSignal($getSignalData);
+    }
+    #endregion
+
+    #region Demo Payment
     /**
      * Demo Pay (Test)
      *
@@ -202,22 +212,19 @@ class VictoriabankMiaClient extends GuzzleClient
      */
     public function demoPay(string $qrHeaderUUID, string $authToken): Result
     {
-        $args = [
+        $demoPayData = [
             'qrHeaderUUID' => $qrHeaderUUID,
             '@http' => [
                 'base_uri' => self::TEST_DEMOPAY_URL
             ]
         ];
 
-        self::setBearerAuthToken($args, $authToken);
-        return parent::demoPay($args);
+        self::setBearerAuthToken($demoPayData, $authToken);
+        return parent::demoPay($demoPayData);
     }
+    #endregion
 
-    private static function setBearerAuthToken(array &$args, string $authToken)
-    {
-        $args['authToken'] = "Bearer $authToken";
-    }
-
+    #region Signature
     /**
      * Decode and validate the callback data signature.
      *
@@ -225,13 +232,15 @@ class VictoriabankMiaClient extends GuzzleClient
      */
     public static function decodeValidateCallback(string $callbackJwt, string $certificate)
     {
-        $algorithm = 'RS256';
-        $publicKey = openssl_pkey_get_public($certificate);
+        $algorithm       = 'RS256';
+        $publicKey       = openssl_pkey_get_public($certificate);
         $decoded_payload = JWT::decode($callbackJwt, new Key($publicKey, $algorithm));
 
         return $decoded_payload;
     }
+    #endregion
 
+    #region Utility
     /**
      * Extract payment transaction ID from payment reference string.
      * Victoriabank MIA API provides only a composed reference string that needs to be parsed.
@@ -239,7 +248,7 @@ class VictoriabankMiaClient extends GuzzleClient
     public static function getPaymentTransactionId(string $paymentReference): string
     {
         $transactionComponents = explode('|', $paymentReference);
-        $transactionId = $transactionComponents[3];
+        $transactionId         = $transactionComponents[3];
 
         return $transactionId;
     }
@@ -251,10 +260,16 @@ class VictoriabankMiaClient extends GuzzleClient
     public static function getPaymentRrn(string $paymentReference): string
     {
         $transactionId = self::getPaymentTransactionId($paymentReference);
-        $paymentRrn = strlen($transactionId) > 12
+        $paymentRrn    = strlen($transactionId) > 12
             ? substr($transactionId, -12)
             : $transactionId;
 
         return $paymentRrn;
     }
+
+    private static function setBearerAuthToken(array &$args, string $authToken)
+    {
+        $args['authToken'] = "Bearer $authToken";
+    }
+    #endregion
 }
