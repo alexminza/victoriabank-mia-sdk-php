@@ -240,9 +240,20 @@ class VictoriabankMiaClient extends GuzzleClient
     public static function decodeValidateCallback(string $callbackJwt, string $certificate)
     {
         $publicKey = openssl_pkey_get_public($certificate);
-        $jwtKey    = new Key($publicKey, 'RS256');
+        if ($publicKey === false) {
+            $error = openssl_error_string();
+            throw new \InvalidArgumentException("Invalid certificate: $error");
+        }
 
-        return JWT::decode($callbackJwt, $jwtKey);
+        try {
+            $jwtKey = new Key($publicKey, 'RS256');
+            return JWT::decode($callbackJwt, $jwtKey);
+        } finally {
+            if (PHP_VERSION_ID < 80000) {
+                // phpcs:ignore Generic.PHP.DeprecatedFunctions.Deprecated -- PHP_VERSION_ID check performed before invocation.
+                openssl_free_key($publicKey);
+            }
+        }
     }
     #endregion
 
