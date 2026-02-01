@@ -228,12 +228,21 @@ class VictoriabankMiaClient extends GuzzleClient
     /**
      * Decode and validate the callback data signature.
      *
-     * @see Firebase\JWT\JWT::decode
+     * @param string $callbackJwt Signal JWT payload
+     * @param string $certificate
+     * 1. a string having the format `file://path/to/file.pem`. The named file must contain a PEM encoded certificate/public key (it may contain both).
+     * 2. a PEM formatted public key.
+     *
+     * @see  Firebase\JWT\JWT::decode
+     * @link https://www.php.net/manual/en/function.openssl-pkey-get-public.php
+     * @link https://www.php.net/manual/en/function.openssl-verify.php
      */
     public static function decodeValidateCallback(string $callbackJwt, string $certificate)
     {
-        $key = new Key($certificate, 'RS256');
-        return JWT::decode($callbackJwt, $key);
+        $publicKey = openssl_pkey_get_public($certificate);
+        $jwtKey    = new Key($publicKey, 'RS256');
+
+        return JWT::decode($callbackJwt, $jwtKey);
     }
     #endregion
 
