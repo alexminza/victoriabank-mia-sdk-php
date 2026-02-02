@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Victoriabank\VictoriabankMia\Tests;
 
 use Victoriabank\VictoriabankMia\VictoriabankMiaClient;
@@ -14,7 +16,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
     protected static $username;
     protected static $password;
     protected static $iban;
-    protected static $publicKey;
+    protected static $certificate;
     protected static $baseUrl;
 
     // Shared state
@@ -33,13 +35,14 @@ class VictoriabankMiaIntegrationTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        self::$username  = getenv('VICTORIABANK_MIA_USERNAME');
-        self::$password  = getenv('VICTORIABANK_MIA_PASSWORD');
-        self::$iban      = getenv('VICTORIABANK_IBAN');
-        self::$publicKey = getenv('VICTORIABANK_PUBLIC_KEY');
-        self::$baseUrl   = VictoriabankMiaClient::TEST_BASE_URL;
+        self::$username    = getenv('VB_MIA_USERNAME');
+        self::$password    = getenv('VB_MIA_PASSWORD');
+        self::$iban        = getenv('VB_IBAN');
+        self::$certificate = getenv('VB_CERTIFICATE');
 
-        if (empty(self::$username) || empty(self::$password) || empty(self::$iban) || empty(self::$publicKey)) {
+        self::$baseUrl = VictoriabankMiaClient::TEST_BASE_URL;
+
+        if (empty(self::$username) || empty(self::$password) || empty(self::$iban) || empty(self::$certificate)) {
             self::markTestSkipped('Integration test credentials not provided.');
         }
     }
@@ -48,12 +51,12 @@ class VictoriabankMiaIntegrationTest extends TestCase
     {
         $options = [
             'base_uri' => self::$baseUrl,
-            'timeout' => 15
+            'timeout' => 30
         ];
 
         #region Logging
-        $classParts = explode('\\', self::class);
-        $logName = end($classParts) . '_guzzle';
+        $classParts  = explode('\\', self::class);
+        $logName     = end($classParts) . '_guzzle';
         $logFileName = "$logName.log";
 
         $log = new \Monolog\Logger($logName);
@@ -73,8 +76,8 @@ class VictoriabankMiaIntegrationTest extends TestCase
         if ($this->isDebugMode()) {
             // https://github.com/guzzle/guzzle/issues/2185
             if ($t instanceof \GuzzleHttp\Command\Exception\CommandException) {
-                $response = $t->getResponse();
-                $responseBody = !empty($response) ? (string) $response->getBody() : '';
+                $response         = $t->getResponse();
+                $responseBody     = !empty($response) ? strval($response->getBody()) : '';
                 $exceptionMessage = $t->getMessage();
 
                 $this->debugLog($responseBody, $exceptionMessage);
@@ -92,7 +95,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
 
     protected function debugLog($message, $data)
     {
-        $data = $this->redactData($data);
+        $data       = $this->redactData($data);
         $data_print = print_r($data, true);
         error_log("$message: $data_print");
     }
@@ -171,9 +174,44 @@ class VictoriabankMiaIntegrationTest extends TestCase
         $this->assertNotEmpty($response['qrExtensionUUID']);
         $this->assertNotEmpty($response['qrAsText']);
 
-        self::$qrHeaderUUID = $response['qrHeaderUUID'];
+        self::$qrHeaderUUID    = $response['qrHeaderUUID'];
         self::$qrExtensionUUID = $response['qrExtensionUUID'];
-        self::$qrData = $qrData;
+        self::$qrData          = $qrData;
+    }
+
+    /**
+     * @depends testAuthenticate
+     */
+    public function testCreatePayeeQrValidationError()
+    {
+        $qrData = [
+            'header' => [
+                'qrType' => 'DYNM',
+                'amountType' => 'Fixed',
+                'pmtContext' => 'e'
+            ],
+            'extension' => [
+                'amount' => [
+                    'sum' => 10.00,
+                    'currencyABC' => 'MDL' // Invalid field
+                ],
+                'ttl' => [
+                    'length' => 60,
+                    'units' => 'hh' // Invalid field
+                ]
+            ]
+        ];
+
+        try {
+            $this->expectException(\GuzzleHttp\Command\Exception\CommandException::class);
+            $this->expectExceptionMessage('[currency] is a required string');
+
+            $response = $this->client->createPayeeQr($qrData, self::$accessToken);
+            $this->debugLog('createPayeeQr', $response);
+        } catch(\Exception $ex) {
+            $this->debugLog('qrCreate', $ex->getMessage());
+            throw $ex;
+        }
     }
 
     /**
@@ -216,9 +254,9 @@ class VictoriabankMiaIntegrationTest extends TestCase
         $this->assertNotEmpty($response['qrExtensionUUID']);
         $this->assertNotEmpty($response['qrAsText']);
 
-        self::$hybridQrHeaderUUID = $response['qrHeaderUUID'];
+        self::$hybridQrHeaderUUID    = $response['qrHeaderUUID'];
         self::$hybridQrExtensionUUID = $response['qrExtensionUUID'];
-        self::$hybridQrData = $hybridData;
+        self::$hybridQrData          = $hybridData;
     }
 
     /**
@@ -327,7 +365,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
     protected function waitDemoPay()
     {
         $maxRetries = 5;
-        $response = null;
+        $response   = null;
 
         for ($i = 0; $i < $maxRetries; $i++) {
             sleep(5);
@@ -396,7 +434,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
     public function testGetReconciliationTransactions()
     {
         $dateFrom = (new \DateTime('today'))->format('Y-m-d\TH:i:s\Z'); // '-1 day'
-        $dateTo = (new \DateTime('tomorrow'))->format('Y-m-d\TH:i:s\Z'); // '+1 day'
+        $dateTo   = (new \DateTime('tomorrow'))->format('Y-m-d\TH:i:s\Z'); // '+1 day'
 
         $response = $this->client->getReconciliationTransactions(self::$accessToken, $dateFrom, $dateTo);
         // $this->debugLog('getReconciliationTransactions', $response);
@@ -404,5 +442,16 @@ class VictoriabankMiaIntegrationTest extends TestCase
         $this->assertNotEmpty($response);
         $this->assertArrayHasKey('transactionsInfo', $response);
         $this->assertNotEmpty($response['transactionsInfo']);
+    }
+
+    public function testDecodeValidateCallback()
+    {
+        $callbackBody = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaWduYWxDb2RlIjoiRXhwaXJhdGlvbiIsInNpZ25hbER0VG0iOiIyMDI0LTEwLTAxVDE1OjA3OjQ1KzAzOjAwIiwicXJIZWFkZXJVVUlEIjoiYmQxMjA0OWItNjUxZC00MGEwLWIyYmMtZDZhMGY3ZTJiN2M3IiwicXJFeHRlbnNpb25VVUlEIjoiNjU0YWNkNjktNjAyYy00MzUxLTk1OTItODE0M2FlMjhkM2U0IiwicGF5bWVudCI6bnVsbH0.WJ5t8jtg2_6DPrxQNIcu50gsW7cDC8IMdjvOBO9wW3toIdeAljlMPxd_lLCWJiKXToRAVHU7a1EB4mLyzyw1iCcRadnsSqm21TrpDZWTjv3uL-XiMLrWOsGBf0aJJRFcGbysU_ym9YLonQMmYLF0voq39yAPMHO7CLCniSMhVdJ9Q5xnrq52y6Yn5YzefCNb2tAQ-erm-8_mCaF0DWd0UFhPA6TRXyV2l5GCkLbyhlUB9gVoVTdSN-XxA_1aoNTusheZPDH1InL03Bx3G8muaVxOMrMIsVCJJYAaTFKiQTBf0M49oTQpdPWeeS9wHaS7aSS3gUcFsOOEPavj7J8vxg';
+        $callbackData = (array) VictoriabankMiaClient::decodeValidateCallback($callbackBody, self::$certificate);
+        // $this->debugLog('decodeValidateCallback', $callbackData);
+
+        $this->assertNotEmpty($callbackData);
+        $this->assertArrayHasKey('signalCode', $callbackData);
+        $this->assertEquals('Expiration', $callbackData['signalCode']);
     }
 }

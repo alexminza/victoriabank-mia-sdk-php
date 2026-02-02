@@ -32,10 +32,10 @@ Add project configuration:
 ```php
 $DEBUG = getenv('DEBUG');
 
-$VB_MIA_BASE_URI = getenv('VB_MIA_BASE_URI');
+$VB_MIA_BASE_URI = getenv('VB_MIA_BASE_URI') ?: VictoriabankMiaClient::TEST_BASE_URL;
 $VB_MIA_USERNAME = getenv('VB_MIA_USERNAME');
 $VB_MIA_PASSWORD = getenv('VB_MIA_PASSWORD');
-$VB_CERTIFICATE  = getenv('VB_CERTIFICATE');
+$VB_CERTIFICATE  = getenv('VB_CERTIFICATE') ?: 'file://VBCA.crt';
 $VB_COMPANY_NAME = getenv('VB_COMPANY_NAME');
 $VB_COMPANY_IBAN = getenv('VB_COMPANY_IBAN');
 ```
@@ -45,7 +45,7 @@ Initialize client:
 ```php
 $options = [
     'base_uri' => $VB_MIA_BASE_URI,
-    'timeout' => 15
+    'timeout' => 30
 ];
 
 if ($DEBUG) {
@@ -106,10 +106,9 @@ $createQrResponse = $vbMiaClient->createPayeeQr($qrData, $accessToken);
 ### Decode callback and validate signature
 
 ```php
-$vbCertificate = file_get_contents($VB_CERTIFICATE);
 $callbackBody = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaWduYWxDb2RlIjoiRXhwaXJhdGlvbiIsInNpZ25hbER0VG0iOiIyMDI0LTEwLTAxVDE1OjA3OjQ1KzAzOjAwIiwicXJIZWFkZXJVVUlEIjoiYmQxMjA0OWItNjUxZC00MGEwLWIyYmMtZDZhMGY3ZTJiN2M3IiwicXJFeHRlbnNpb25VVUlEIjoiNjU0YWNkNjktNjAyYy00MzUxLTk1OTItODE0M2FlMjhkM2U0IiwicGF5bWVudCI6bnVsbH0.WJ5t8jtg2_6DPrxQNIcu50gsW7cDC8IMdjvOBO9wW3toIdeAljlMPxd_lLCWJiKXToRAVHU7a1EB4mLyzyw1iCcRadnsSqm21TrpDZWTjv3uL-XiMLrWOsGBf0aJJRFcGbysU_ym9YLonQMmYLF0voq39yAPMHO7CLCniSMhVdJ9Q5xnrq52y6Yn5YzefCNb2tAQ-erm-8_mCaF0DWd0UFhPA6TRXyV2l5GCkLbyhlUB9gVoVTdSN-XxA_1aoNTusheZPDH1InL03Bx3G8muaVxOMrMIsVCJJYAaTFKiQTBf0M49oTQpdPWeeS9wHaS7aSS3gUcFsOOEPavj7J8vxg';
 
-$callbackData = VictoriabankMiaClient::decodeValidateCallback($callbackBody, $vbCertificate);
+$callbackData = VictoriabankMiaClient::decodeValidateCallback($callbackBody, $VB_CERTIFICATE);
 ```
 
 ### Perform a test QR payment
