@@ -8,8 +8,6 @@ use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Command\Guzzle\DescriptionInterface;
 use GuzzleHttp\Command\Guzzle\GuzzleClient;
-use GuzzleHttp\Command\Guzzle\RequestLocation\FormParamLocation;
-use GuzzleHttp\Command\Guzzle\Serializer;
 use GuzzleHttp\Command\Result;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
@@ -31,17 +29,7 @@ class VictoriabankMiaClient extends GuzzleClient
         $client      = $client ?? new Client();
         $description = $description ?? new VictoriabankMiaDescription();
 
-        // The default FormParamLocation sets Content-Type to
-        // 'application/x-www-form-urlencoded; charset=utf-8', which causes a
-        // 403 Forbidden response from the WAF on the /identity/token endpoint.
-        // Override it to send the plain value without the charset parameter.
-        $formParamLocation = new class ('formParam') extends FormParamLocation {
-            protected $contentType = 'application/x-www-form-urlencoded';
-        };
-
-        $serializer = new Serializer($description, ['formParam' => $formParamLocation]);
-
-        parent::__construct($client, $description, $serializer, null, null, $config);
+        parent::__construct($client, $description, null, null, null, $config);
     }
 
     #region Health
@@ -60,7 +48,7 @@ class VictoriabankMiaClient extends GuzzleClient
      *
      * @link https://test-ipspj.victoriabank.md/index.html#operations-Token-post_identity_token
      */
-    public function getToken(string $grant_type, ?string $username = null, ?string $password = null, ?string $refresh_token = null): Result
+    public function getToken(string $grant_type, string $username, string $password, ?string $refresh_token = null): Result
     {
         $supported_grant_types = ['password', 'refresh_token'];
         if (!in_array($grant_type, $supported_grant_types, true)) {
@@ -77,19 +65,10 @@ class VictoriabankMiaClient extends GuzzleClient
 
         $getTokenData = [
             'grant_type' => $grant_type,
+            'username' => $username,
+            'password' => $password,
+            'refresh_token' => $refresh_token
         ];
-
-        if (!empty($username)) {
-            $getTokenData['username'] = $username;
-        }
-
-        if (!empty($password)) {
-            $getTokenData['password'] = $password;
-        }
-
-        if (!empty($refresh_token)) {
-            $getTokenData['refresh_token'] = $refresh_token;
-        }
 
         return parent::getToken($getTokenData);
     }
