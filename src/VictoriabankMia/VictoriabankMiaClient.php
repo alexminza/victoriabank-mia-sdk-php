@@ -50,6 +50,19 @@ class VictoriabankMiaClient extends GuzzleClient
      */
     public function getToken(string $grant_type, string $username, string $password, ?string $refresh_token = null): Result
     {
+        $supported_grant_types = ['password', 'refresh_token'];
+        if (!in_array($grant_type, $supported_grant_types, true)) {
+            throw new \InvalidArgumentException("Unsupported grant_type: {$grant_type}");
+        }
+
+        if ($grant_type === 'password' && (empty($username) || empty($password))) {
+            throw new \InvalidArgumentException('username and password are required for password grant_type');
+        }
+
+        if ($grant_type === 'refresh_token' && empty($refresh_token)) {
+            throw new \InvalidArgumentException('refresh_token is required for refresh_token grant_type');
+        }
+
         $getTokenData = [
             'grant_type' => $grant_type,
             'username' => $username,
