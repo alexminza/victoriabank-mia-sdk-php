@@ -433,8 +433,11 @@ class VictoriabankMiaIntegrationTest extends TestCase
      */
     public function testGetReconciliationTransactions()
     {
-        $dateFrom = (new \DateTime('today'))->format('Y-m-d\TH:i:s\Z'); // '-1 day'
-        $dateTo   = (new \DateTime('tomorrow'))->format('Y-m-d\TH:i:s\Z'); // '+1 day'
+        $tz = new \DateTimeZone('Europe/Chisinau');
+
+        // format(\DateTimeInterface::RFC3339)
+        $dateFrom = (new \DateTimeImmutable('today', $tz))->format('Y-m-d'); // '-1 day'
+        $dateTo   = (new \DateTimeImmutable('tomorrow', $tz))->format('Y-m-d'); // '+1 day'
 
         $response = $this->client->getReconciliationTransactions(self::$accessToken, $dateFrom, $dateTo);
         // $this->debugLog('getReconciliationTransactions', $response);
