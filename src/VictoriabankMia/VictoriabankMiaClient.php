@@ -49,7 +49,7 @@ class VictoriabankMiaClient extends GuzzleClient
      *
      * @link https://test-ipspj.victoriabank.md/index.html#operations-Token-post_identity_token
      */
-    public function getToken(string $grant_type, string $username, string $password, ?string $refresh_token = null): Result
+    public function getToken(string $grant_type, ?string $username = null, ?string $password = null, ?string $refresh_token = null): Result
     {
         $supported_grant_types = ['password', 'refresh_token'];
         if (!in_array($grant_type, $supported_grant_types, true)) {
@@ -64,12 +64,12 @@ class VictoriabankMiaClient extends GuzzleClient
             throw new \InvalidArgumentException('refresh_token is required for refresh_token grant_type');
         }
 
-        $getTokenData = [
-            'grant_type' => $grant_type,
-            'username' => $username,
-            'password' => $password,
-            'refresh_token' => $refresh_token
-        ];
+        $getTokenData = array_filter([
+            'grant_type'    => $grant_type,
+            'username'      => $username,
+            'password'      => $password,
+            'refresh_token' => $refresh_token,
+        ]);
 
         return parent::getToken($getTokenData);
     }
