@@ -26,10 +26,10 @@
         "source": "https://github.com/alexminza/victoriabank-mia-sdk-php"
     },
     "require": {
-        "php": ">=7.2.5",
+        "php": ">=8.0",
         "guzzlehttp/guzzle": "^7.0",
         "guzzlehttp/guzzle-services": "^1.0",
-        "firebase/php-jwt": "^6.0"
+        "firebase/php-jwt": "^7.0"
     },
     "suggest": {
         "monolog/monolog": "To enable logging of HTTP requests and responses."
@@ -49,7 +49,7 @@
     },
     "config": {
         "platform": {
-            "php": "7.2.5"
+            "php": "8.0.0"
         },
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true

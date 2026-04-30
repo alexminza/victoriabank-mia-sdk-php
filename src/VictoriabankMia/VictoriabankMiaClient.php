@@ -36,6 +36,7 @@ class VictoriabankMiaClient extends GuzzleClient
     /**
      * @link https://test-ipspj.victoriabank.md/index.html#operations-Health-get_api_v1_health_status
      */
+    // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod.Found
     public function getHealthStatus(): Result
     {
         return parent::getHealthStatus();
