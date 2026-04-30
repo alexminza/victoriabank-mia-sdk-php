@@ -223,8 +223,8 @@ class VictoriabankMiaDescription extends Description
                 'type' => 'object',
                 'additionalProperties' => ['location' => 'json'],
                 'properties' => [
-                    'dateFrom' => ['type' => 'string', 'format' => 'date-time'],
-                    'dateTo' => ['type' => 'string', 'format' => 'date-time'],
+                    'dateFrom' => ['type' => 'string', 'format' => 'date'], // 'date-time'
+                    'dateTo' => ['type' => 'string', 'format' => 'date'], // 'date-time'
                     'messageId' => ['type' => 'string'],
                 ],
             ],

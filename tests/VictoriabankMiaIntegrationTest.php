@@ -13,25 +13,22 @@ use PHPUnit\Framework\TestCase;
  */
 class VictoriabankMiaIntegrationTest extends TestCase
 {
-    protected static $username;
-    protected static $password;
-    protected static $iban;
-    protected static $certificate;
-    protected static $baseUrl;
+    protected static ?string $username    = null;
+    protected static ?string $password    = null;
+    protected static ?string $iban        = null;
+    protected static ?string $certificate = null;
+    protected static ?string $baseUrl     = null;
 
     // Shared state
-    protected static $accessToken;
-    protected static $qrHeaderUUID;
-    protected static $qrExtensionUUID;
-    protected static $hybridQrHeaderUUID;
-    protected static $hybridQrExtensionUUID;
-    protected static $qrData;
-    protected static $hybridQrData;
+    protected static ?string $accessToken           = null;
+    protected static ?string $qrHeaderUUID          = null;
+    protected static ?string $qrExtensionUUID       = null;
+    protected static ?string $hybridQrHeaderUUID    = null;
+    protected static ?string $hybridQrExtensionUUID = null;
+    protected static ?array  $qrData                = null;
+    protected static ?array  $hybridQrData          = null;
 
-    /**
-     * @var VictoriabankMiaClient
-     */
-    protected $client;
+    protected VictoriabankMiaClient $client;
 
     public static function setUpBeforeClass(): void
     {
@@ -93,14 +90,14 @@ class VictoriabankMiaIntegrationTest extends TestCase
         return in_array('--debug', $_SERVER['argv'] ?? []);
     }
 
-    protected function debugLog($message, $data)
+    protected function debugLog(string $message, mixed $data): void
     {
         $data       = $this->redactData($data);
         $data_print = print_r($data, true);
         error_log("$message: $data_print");
     }
 
-    protected function redactData($data)
+    protected function redactData(mixed $data): mixed
     {
         if (is_array($data)) {
             if (isset($data['qrAsImage'])) {
@@ -433,8 +430,11 @@ class VictoriabankMiaIntegrationTest extends TestCase
      */
     public function testGetReconciliationTransactions()
     {
-        $dateFrom = (new \DateTime('today'))->format('Y-m-d\TH:i:s\Z'); // '-1 day'
-        $dateTo   = (new \DateTime('tomorrow'))->format('Y-m-d\TH:i:s\Z'); // '+1 day'
+        $tz = new \DateTimeZone('Europe/Chisinau');
+
+        // format(\DateTimeInterface::RFC3339)
+        $dateFrom = (new \DateTimeImmutable('today', $tz))->format('Y-m-d'); // '-1 day'
+        $dateTo   = (new \DateTimeImmutable('tomorrow', $tz))->format('Y-m-d'); // '+1 day'
 
         $response = $this->client->getReconciliationTransactions(self::$accessToken, $dateFrom, $dateTo);
         // $this->debugLog('getReconciliationTransactions', $response);

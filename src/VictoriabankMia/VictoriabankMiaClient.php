@@ -36,6 +36,7 @@ class VictoriabankMiaClient extends GuzzleClient
     /**
      * @link https://test-ipspj.victoriabank.md/index.html#operations-Health-get_api_v1_health_status
      */
+    // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod.Found
     public function getHealthStatus(): Result
     {
         return parent::getHealthStatus();
@@ -48,14 +49,27 @@ class VictoriabankMiaClient extends GuzzleClient
      *
      * @link https://test-ipspj.victoriabank.md/index.html#operations-Token-post_identity_token
      */
-    public function getToken(string $grant_type, string $username, string $password, ?string $refresh_token = null): Result
+    public function getToken(string $grant_type, ?string $username = null, ?string $password = null, ?string $refresh_token = null): Result
     {
-        $getTokenData = [
-            'grant_type' => $grant_type,
-            'username' => $username,
-            'password' => $password,
-            'refresh_token' => $refresh_token
-        ];
+        $supported_grant_types = ['password', 'refresh_token'];
+        if (!in_array($grant_type, $supported_grant_types, true)) {
+            throw new \InvalidArgumentException("Unsupported grant_type: {$grant_type}");
+        }
+
+        if ($grant_type === 'password' && (empty($username) || empty($password))) {
+            throw new \InvalidArgumentException('username and password are required for password grant_type');
+        }
+
+        if ($grant_type === 'refresh_token' && empty($refresh_token)) {
+            throw new \InvalidArgumentException('refresh_token is required for refresh_token grant_type');
+        }
+
+        $getTokenData = array_filter([
+            'grant_type'    => $grant_type,
+            'username'      => $username,
+            'password'      => $password,
+            'refresh_token' => $refresh_token,
+        ]);
 
         return parent::getToken($getTokenData);
     }
