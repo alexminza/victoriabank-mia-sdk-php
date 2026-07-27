@@ -362,7 +362,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
 
     protected function waitDemoPay()
     {
-        $maxRetries = 5;
+        $maxRetries = 6;
         $response   = null;
 
         for ($i = 0; $i < $maxRetries; $i++) {
@@ -390,7 +390,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
 
     protected function waitSignal()
     {
-        $maxRetries = 5;
+        $maxRetries = 12;
 
         for ($i = 0; $i < $maxRetries; $i++) {
             sleep(5);
@@ -419,7 +419,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
 
     protected function waitTransactionApproved(string $transactionId)
     {
-        $maxRetries = 5;
+        $maxRetries = 6;
 
         for ($i = 0; $i < $maxRetries; $i++) {
             sleep(5);

@@ -79,8 +79,8 @@ $accessToken = $tokenResponse['accessToken'];
 $qrData = [
     'header' => [
         'qrType' => 'DYNM', # Type of QR code: DYNM - Dynamic QR, STAT - Static QR, HYBR - Hybrid QR
-        'amountType' => 'Fixed', # Specifies the type of amount: Fixed - Dynamic QR, Controlled - Static QR, Free - Hybrid QR
-        'pmtContext' => 'e' #Payment context: m - mobile payment, e - e-commerce payment, i - invoice payment, 0 - other
+        'amountType' => 'Fixed', # Fixed - exact amount, Controlled - amount range, Free - payer chooses the amount (STAT only)
+        'pmtContext' => 'e' # Payment context: m - mobile, e - e-commerce, i - invoice, o - other
     ],
     'extension' => [
         'creditorAccount' => [
