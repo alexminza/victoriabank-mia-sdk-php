@@ -6,6 +6,7 @@ namespace Victoriabank\VictoriabankMia\Tests;
 
 use Victoriabank\VictoriabankMia\VictoriabankMiaClient;
 use GuzzleHttp\Client;
+use GuzzleHttp\Command\Exception\CommandClientException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -361,7 +362,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
 
     protected function waitDemoPay()
     {
-        $maxRetries = 5;
+        $maxRetries = 6;
         $response   = null;
 
         for ($i = 0; $i < $maxRetries; $i++) {
@@ -387,6 +388,58 @@ class VictoriabankMiaIntegrationTest extends TestCase
         return $response;
     }
 
+    protected function waitSignal()
+    {
+        $maxRetries = 12;
+
+        for ($i = 0; $i < $maxRetries; $i++) {
+            sleep(5);
+
+            try {
+                return $this->client->getSignal(self::$qrExtensionUUID, self::$accessToken);
+            } catch (CommandClientException $ex) {
+                $response = $ex->getResponse();
+                if (empty($response) || $response->getStatusCode() !== 404) {
+                    throw $ex;
+                }
+            }
+        }
+
+        $this->fail('Signal should be available after demoPay');
+    }
+
+    protected function getTodayReconciliationTransactions()
+    {
+        $tz       = new \DateTimeZone('Europe/Chisinau');
+        $dateFrom = (new \DateTimeImmutable('today', $tz))->format('Y-m-d');
+        $dateTo   = (new \DateTimeImmutable('tomorrow', $tz))->format('Y-m-d');
+
+        return $this->client->getReconciliationTransactions(self::$accessToken, $dateFrom, $dateTo);
+    }
+
+    protected function waitTransactionApproved(string $transactionId)
+    {
+        $maxRetries = 6;
+
+        for ($i = 0; $i < $maxRetries; $i++) {
+            sleep(5);
+
+            $response = $this->getTodayReconciliationTransactions();
+
+            foreach ($response['transactionsInfo'] as $transaction) {
+                if ($transaction['id'] !== $transactionId) {
+                    continue;
+                }
+
+                if ($transaction['transactionStatus'] === 'Approved') {
+                    return;
+                }
+            }
+        }
+
+        $this->fail("Transaction $transactionId should be approved after demoPay");
+    }
+
     /**
      * @depends testGetSignal
      */
@@ -401,6 +454,8 @@ class VictoriabankMiaIntegrationTest extends TestCase
         $transactionId = VictoriabankMiaClient::getPaymentTransactionId($payment['reference']);
         $this->assertNotEmpty($transactionId);
 
+        $this->waitTransactionApproved($transactionId);
+
         $response = $this->client->reverseTransaction($transactionId, self::$accessToken);
         // $this->debugLog('reverseTransaction', $response);
 
@@ -413,9 +468,9 @@ class VictoriabankMiaIntegrationTest extends TestCase
      */
     public function testGetSignal()
     {
-        $response = $this->waitDemoPay();
+        $this->waitDemoPay();
 
-        $response = $this->client->getSignal(self::$qrExtensionUUID, self::$accessToken);
+        $response = $this->waitSignal();
         // $this->debugLog('getSignal', $response);
 
         $this->assertNotEmpty($response);
@@ -430,13 +485,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
      */
     public function testGetReconciliationTransactions()
     {
-        $tz = new \DateTimeZone('Europe/Chisinau');
-
-        // format(\DateTimeInterface::RFC3339)
-        $dateFrom = (new \DateTimeImmutable('today', $tz))->format('Y-m-d'); // '-1 day'
-        $dateTo   = (new \DateTimeImmutable('tomorrow', $tz))->format('Y-m-d'); // '+1 day'
-
-        $response = $this->client->getReconciliationTransactions(self::$accessToken, $dateFrom, $dateTo);
+        $response = $this->getTodayReconciliationTransactions();
         // $this->debugLog('getReconciliationTransactions', $response);
 
         $this->assertNotEmpty($response);

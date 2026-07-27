@@ -176,8 +176,8 @@ class VictoriabankMiaClient extends GuzzleClient
     public function getReconciliationTransactions(string $authToken, ?string $dateFrom = null, ?string $dateTo = null, ?string $messageId = null): Result
     {
         $getReconciliationTransactionsData = [
-            'dateFrom' => $dateFrom,
-            'dateTo' => $dateTo,
+            'datefrom' => $dateFrom,
+            'dateto' => $dateTo,
             'messageId' => $messageId,
         ];
 
