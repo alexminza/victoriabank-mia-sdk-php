@@ -171,6 +171,11 @@ class VictoriabankMiaClient extends GuzzleClient
     /**
      * Transaction list for reconciliation.
      *
+     * The deployed API currently requires date-only values despite the documented date-time format.
+     *
+     * @param string|null $dateFrom Start date in Y-m-d format
+     * @param string|null $dateTo End date in Y-m-d format
+     *
      * @link https://test-ipspj.victoriabank.md/index.html#operations-Reconciliation-get_api_v1_reconciliation_transactions
      */
     public function getReconciliationTransactions(string $authToken, ?string $dateFrom = null, ?string $dateTo = null, ?string $messageId = null): Result

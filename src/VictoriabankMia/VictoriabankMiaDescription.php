@@ -223,6 +223,7 @@ class VictoriabankMiaDescription extends Description
                 'type' => 'object',
                 'additionalProperties' => ['location' => 'json'],
                 'properties' => [
+                    // Temporary workaround for the deployed API's mismatch with the documented date-time format.
                     'datefrom' => ['type' => 'string', 'format' => 'date'], // 'date-time'
                     'dateto' => ['type' => 'string', 'format' => 'date'], // 'date-time'
                     'messageId' => ['type' => 'string'],
