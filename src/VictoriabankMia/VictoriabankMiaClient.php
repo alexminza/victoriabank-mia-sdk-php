@@ -204,6 +204,22 @@ class VictoriabankMiaClient extends GuzzleClient
         self::setBearerAuthToken($reverseTransactionData, $authToken);
         return parent::reverseTransaction($reverseTransactionData);
     }
+
+    /**
+     * Partially reverse an already processed transaction.
+     *
+     * @link https://test-ipspj.victoriabank.md/index.html#operations-Transaction-delete_api_v1_transaction__id__partial_refund
+     */
+    public function partialRefundTransaction(string $id, int|float $amount, string $authToken): Result
+    {
+        $partialRefundTransactionData = [
+            'id' => $id,
+            'amount' => $amount,
+        ];
+
+        self::setBearerAuthToken($partialRefundTransactionData, $authToken);
+        return parent::partialRefundTransaction($partialRefundTransactionData);
+    }
     #endregion
 
     #region Signal

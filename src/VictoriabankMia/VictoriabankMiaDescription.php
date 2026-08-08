@@ -94,6 +94,13 @@ class VictoriabankMiaDescription extends Description
                     'currency' => ['type' => 'string', 'required' => true, 'location' => 'json'],
                 ],
             ],
+            'PartialRefundApiRequestDto' => [
+                'type' => 'object',
+                'additionalProperties' => ['location' => 'json'],
+                'properties' => [
+                    'amount' => ['type' => 'number', 'description' => 'Amount for return'],
+                ],
+            ],
             'PayeeAccountDto' => [
                 'type' => 'object',
                 'additionalProperties' => ['location' => 'json'],
@@ -369,6 +376,17 @@ class VictoriabankMiaDescription extends Description
                         'id' => ['type' => 'string', 'location' => 'uri', 'required' => true],
                     ],
                     'additionalParameters' => ['location' => 'query'],
+                ],
+                'partialRefundTransaction' => [
+                    'extends' => 'baseOp',
+                    'httpMethod' => 'DELETE',
+                    'uri' => '/api/v1/transaction/{id}/partial-refund',
+                    'summary' => 'Partially reverse already processed transaction',
+                    'parameters' => array_merge([
+                        'authToken' => $authorizationHeader,
+                        'id' => ['type' => 'string', 'location' => 'uri', 'required' => true],
+                    ], self::getProperties($models, 'PartialRefundApiRequestDto')),
+                    'additionalParameters' => ['location' => 'json'],
                 ],
                 #endregion
 
