@@ -15,8 +15,8 @@ use Firebase\JWT\Key;
 /**
  * Victoriabank MIA API client
  *
- * @link https://test-ipspj.victoriabank.md
- * @link https://test-ipspj-demopay.victoriabank.md/swagger/
+ * @link https://test-ipspj.victoriabank.md/index.html
+ * @link https://test-ipspj-demopay.victoriabank.md/swagger/index.html
  */
 class VictoriabankMiaClient extends GuzzleClient
 {

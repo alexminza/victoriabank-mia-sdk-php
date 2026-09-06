@@ -10,8 +10,8 @@ use Composer\InstalledVersions;
 /**
  * Victoriabank MIA API service description
  *
- * @link https://test-ipspj.victoriabank.md
- * @link https://test-ipspj-demopay.victoriabank.md/swagger/
+ * @link https://test-ipspj.victoriabank.md/index.html
+ * @link https://test-ipspj-demopay.victoriabank.md/swagger/index.html
  */
 class VictoriabankMiaDescription extends Description
 {
