@@ -15,8 +15,8 @@ use Firebase\JWT\Key;
 /**
  * Victoriabank MIA API client
  *
- * @link https://test-ipspj.victoriabank.md
- * @link https://test-ipspj-demopay.victoriabank.md/swagger/
+ * @link https://test-ipspj.victoriabank.md/index.html
+ * @link https://test-ipspj-demopay.victoriabank.md/swagger/index.html
  */
 class VictoriabankMiaClient extends GuzzleClient
 {
@@ -171,6 +171,11 @@ class VictoriabankMiaClient extends GuzzleClient
     /**
      * Transaction list for reconciliation.
      *
+     * The deployed API currently requires date-only values despite the documented date-time format.
+     *
+     * @param string|null $dateFrom Start date in Y-m-d format
+     * @param string|null $dateTo End date in Y-m-d format
+     *
      * @link https://test-ipspj.victoriabank.md/index.html#operations-Reconciliation-get_api_v1_reconciliation_transactions
      */
     public function getReconciliationTransactions(string $authToken, ?string $dateFrom = null, ?string $dateTo = null, ?string $messageId = null): Result
@@ -198,6 +203,22 @@ class VictoriabankMiaClient extends GuzzleClient
 
         self::setBearerAuthToken($reverseTransactionData, $authToken);
         return parent::reverseTransaction($reverseTransactionData);
+    }
+
+    /**
+     * Partially reverse an already processed transaction.
+     *
+     * @link https://test-ipspj.victoriabank.md/index.html#operations-Transaction-delete_api_v1_transaction__id__partial_refund
+     */
+    public function partialRefundTransaction(string $id, int|float $amount, string $authToken): Result
+    {
+        $partialRefundTransactionData = [
+            'id' => $id,
+            'amount' => $amount,
+        ];
+
+        self::setBearerAuthToken($partialRefundTransactionData, $authToken);
+        return parent::partialRefundTransaction($partialRefundTransactionData);
     }
     #endregion
 

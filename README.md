@@ -124,9 +124,16 @@ $demoPayResponse = $vbMiaClient->demoPay($qrHeaderUUID, $accessToken);
 $getPayeeQrStatusResponse = $vbMiaClient->getPayeeQrStatus($qrHeaderUUID, $accessToken);
 ```
 
-### Refund payment
+### Fully refund payment
 
 ```php
 $paymentTransactionId = VictoriabankMiaClient::getPaymentTransactionId($callbackData->payment->reference);
 $vbMiaClient->reverseTransaction($paymentTransactionId, $accessToken);
+```
+
+### Partially refund payment
+
+```php
+$paymentTransactionId = VictoriabankMiaClient::getPaymentTransactionId($callbackData->payment->reference);
+$vbMiaClient->partialRefundTransaction($paymentTransactionId, 50.00, $accessToken);
 ```

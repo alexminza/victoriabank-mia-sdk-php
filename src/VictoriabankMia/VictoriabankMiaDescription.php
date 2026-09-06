@@ -10,8 +10,8 @@ use Composer\InstalledVersions;
 /**
  * Victoriabank MIA API service description
  *
- * @link https://test-ipspj.victoriabank.md
- * @link https://test-ipspj-demopay.victoriabank.md/swagger/
+ * @link https://test-ipspj.victoriabank.md/index.html
+ * @link https://test-ipspj-demopay.victoriabank.md/swagger/index.html
  */
 class VictoriabankMiaDescription extends Description
 {
@@ -92,6 +92,13 @@ class VictoriabankMiaDescription extends Description
                 'properties' => [
                     'sum' => ['type' => 'number', 'required' => true, 'location' => 'json'],
                     'currency' => ['type' => 'string', 'required' => true, 'location' => 'json'],
+                ],
+            ],
+            'PartialRefundApiRequestDto' => [
+                'type' => 'object',
+                'additionalProperties' => ['location' => 'json'],
+                'properties' => [
+                    'amount' => ['type' => 'number', 'description' => 'Amount for return'],
                 ],
             ],
             'PayeeAccountDto' => [
@@ -223,6 +230,7 @@ class VictoriabankMiaDescription extends Description
                 'type' => 'object',
                 'additionalProperties' => ['location' => 'json'],
                 'properties' => [
+                    // Temporary workaround for the deployed API's mismatch with the documented date-time format.
                     'datefrom' => ['type' => 'string', 'format' => 'date'], // 'date-time'
                     'dateto' => ['type' => 'string', 'format' => 'date'], // 'date-time'
                     'messageId' => ['type' => 'string'],
@@ -368,6 +376,17 @@ class VictoriabankMiaDescription extends Description
                         'id' => ['type' => 'string', 'location' => 'uri', 'required' => true],
                     ],
                     'additionalParameters' => ['location' => 'query'],
+                ],
+                'partialRefundTransaction' => [
+                    'extends' => 'baseOp',
+                    'httpMethod' => 'DELETE',
+                    'uri' => '/api/v1/transaction/{id}/partial-refund',
+                    'summary' => 'Partially reverse already processed transaction',
+                    'parameters' => array_merge([
+                        'authToken' => $authorizationHeader,
+                        'id' => ['type' => 'string', 'location' => 'uri', 'required' => true],
+                    ], self::getProperties($models, 'PartialRefundApiRequestDto')),
+                    'additionalParameters' => ['location' => 'json'],
                 ],
                 #endregion
 
