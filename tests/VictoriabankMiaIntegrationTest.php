@@ -360,14 +360,15 @@ class VictoriabankMiaIntegrationTest extends TestCase
         $this->assertEmpty($response);
     }
 
-    protected function waitDemoPay()
+    protected function waitDemoPay(?string $qrHeaderUUID = null)
     {
-        $maxRetries = 6;
-        $response   = null;
+        $qrHeaderUUID = $qrHeaderUUID ?? self::$qrHeaderUUID;
+        $maxRetries   = 6;
+        $response     = null;
 
         for ($i = 0; $i < $maxRetries; $i++) {
             sleep(5);
-            $response = $this->client->getPayeeQrStatus(self::$qrHeaderUUID, self::$accessToken, 1, 1);
+            $response = $this->client->getPayeeQrStatus($qrHeaderUUID, self::$accessToken, 1, 1);
             // $this->debugLog('getPayeeQrStatus', $response);
 
             $this->assertNotEmpty($response);
@@ -412,7 +413,7 @@ class VictoriabankMiaIntegrationTest extends TestCase
     {
         $tz       = new \DateTimeZone('Europe/Chisinau');
         $dateFrom = (new \DateTimeImmutable('today', $tz))->format('Y-m-d');
-        $dateTo   = (new \DateTimeImmutable('tomorrow', $tz))->format('Y-m-d');
+        $dateTo   = (new \DateTimeImmutable('today', $tz))->format('Y-m-d');
 
         return $this->client->getReconciliationTransactions(self::$accessToken, $dateFrom, $dateTo);
     }
@@ -438,6 +439,44 @@ class VictoriabankMiaIntegrationTest extends TestCase
         }
 
         $this->fail("Transaction $transactionId should be approved after demoPay");
+    }
+
+    protected function createApprovedTransaction(): string
+    {
+        $response = $this->client->createPayeeQr(self::$qrData, self::$accessToken);
+        $this->assertNotEmpty($response);
+        $this->assertArrayHasKey('qrHeaderUUID', $response);
+
+        $qrHeaderUUID = $response['qrHeaderUUID'];
+        $this->client->demoPay($qrHeaderUUID, self::$accessToken);
+
+        $response = $this->waitDemoPay($qrHeaderUUID);
+        $payment  = $response['extensions'][0]['payments'][0];
+        $this->assertNotEmpty($payment);
+        $this->assertArrayHasKey('reference', $payment);
+
+        $transactionId = VictoriabankMiaClient::getPaymentTransactionId($payment['reference']);
+        $this->assertNotEmpty($transactionId);
+
+        $this->waitTransactionApproved($transactionId);
+
+        return $transactionId;
+    }
+
+    /**
+     * The deployed API currently returns 404 for any refund after the first successful refund,
+     * so partial and full refunds must be tested with separate transactions.
+     *
+     * @depends testCreatePayeeQr
+     */
+    public function testPartialRefundTransaction()
+    {
+        $transactionId = $this->createApprovedTransaction();
+
+        $response = $this->client->partialRefundTransaction($transactionId, 1.00, self::$accessToken);
+
+        $this->assertNotNull($response);
+        $this->assertEmpty($response);
     }
 
     /**

@@ -27,8 +27,9 @@
     },
     "require": {
         "php": ">=8.0",
-        "guzzlehttp/guzzle": "^7.0",
-        "guzzlehttp/guzzle-services": "^1.0",
+        "ext-openssl": "*",
+        "guzzlehttp/guzzle": "^7.0 || ^8.0",
+        "guzzlehttp/guzzle-services": "^1.0 || ^2.0",
         "firebase/php-jwt": "^7.0"
     },
     "suggest": {

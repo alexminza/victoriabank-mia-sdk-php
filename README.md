@@ -2,8 +2,8 @@
 
 ![Victoriabank MIA](https://repository-images.githubusercontent.com/1072137871/2b121be2-e5b1-40d9-a170-0c42295c615e)
 
-* Victoriabank IPS Business WebApi docs: https://test-ipspj.victoriabank.md
-* Victoriabank IPS DemoPay WebApi https://test-ipspj-demopay.victoriabank.md/swagger/
+* Victoriabank IPS Business WebApi docs: https://test-ipspj.victoriabank.md/index.html
+* Victoriabank IPS DemoPay WebApi https://test-ipspj-demopay.victoriabank.md/swagger/index.html
 * GitHub project https://github.com/alexminza/victoriabank-mia-sdk-php
 * Composer package https://packagist.org/packages/alexminza/victoriabank-mia-sdk
 
@@ -124,9 +124,16 @@ $demoPayResponse = $vbMiaClient->demoPay($qrHeaderUUID, $accessToken);
 $getPayeeQrStatusResponse = $vbMiaClient->getPayeeQrStatus($qrHeaderUUID, $accessToken);
 ```
 
-### Refund payment
+### Fully refund payment
 
 ```php
 $paymentTransactionId = VictoriabankMiaClient::getPaymentTransactionId($callbackData->payment->reference);
 $vbMiaClient->reverseTransaction($paymentTransactionId, $accessToken);
+```
+
+### Partially refund payment
+
+```php
+$paymentTransactionId = VictoriabankMiaClient::getPaymentTransactionId($callbackData->payment->reference);
+$vbMiaClient->partialRefundTransaction($paymentTransactionId, 50.00, $accessToken);
 ```
